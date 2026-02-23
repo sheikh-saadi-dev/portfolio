@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — Sheikh Saadi</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{--gold:#c9a84c;--gl:#e8c87a;--gd:#9a7a2e;--ink:#080808;--s1:#0f0f0f;--s2:#161616;--s3:#1e1e1e;--mu:#777;--br:rgba(201,168,76,0.15);--tx:#e8e8e8;--red:#e85757;--grn:#25d366;--r:14px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Space Grotesk",sans-serif;background:var(--ink);color:var(--tx);min-height:100vh;display:flex}
+h1,h2,h3{font-family:"Syne",sans-serif}
+/* LOGIN */
+#login{position:fixed;inset:0;z-index:9999;background:var(--ink);display:flex;align-items:center;justify-content:center;transition:opacity .5s,visibility .5s}
+#login.hide{opacity:0;visibility:hidden;pointer-events:none}
+.lb{width:100%;max-width:400px;padding:48px 40px;background:var(--s1);border:1px solid var(--br);border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,.6);text-align:center}
+.ll{font-family:"Syne",sans-serif;font-weight:800;font-size:2rem;background:linear-gradient(135deg,var(--gl),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.ls{color:var(--mu);font-size:.85rem;margin-bottom:32px}
+.lf{margin-bottom:16px;text-align:left}
+.lf label{display:block;font-size:.72rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.lf input{width:100%;padding:13px 16px;border:1px solid var(--br);border-radius:12px;background:var(--s2);color:var(--tx);font-family:"Space Grotesk",sans-serif;font-size:.92rem;outline:none;transition:border-color .3s}
+.lf input:focus{border-color:rgba(201,168,76,.5);box-shadow:0 0 0 3px rgba(201,168,76,.08)}
+.lbtn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gl),var(--gold));color:#080808;border:none;border-radius:50px;font-weight:700;font-size:.95rem;cursor:pointer;font-family:"Space Grotesk",sans-serif;margin-top:8px;transition:transform .2s,box-shadow .2s;box-shadow:0 6px 20px rgba(201,168,76,.3)}
+.lbtn:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(201,168,76,.4)}
+.lerr{color:var(--red);font-size:.82rem;margin-top:10px;display:none}
+.dbs{margin-top:14px;font-size:.78rem;display:flex;align-items:center;justify-content:center;gap:7px;color:var(--mu)}
+.dbd{width:8px;height:8px;border-radius:50%;background:var(--mu);flex-shrink:0}
+.dbd.ok{background:var(--grn);animation:pulse 2s infinite}
+.dbd.err{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+/* SIDEBAR */
+.sb{width:250px;background:var(--s1);border-right:1px solid var(--br);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.sbr{padding:26px 22px 18px;border-bottom:1px solid var(--br)}
+.sbr .b{font-family:"Syne",sans-serif;font-weight:800;font-size:1.15rem}.sbr .b span{color:var(--gold)}
+.sbr .s{font-size:.7rem;color:var(--mu);margin-top:2px}
+.sn{flex:1;padding:14px 0}
+.sg{font-size:.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--mu);padding:10px 22px 4px}
+.ni{display:flex;align-items:center;gap:11px;padding:11px 22px;cursor:pointer;font-size:.86rem;font-weight:600;color:var(--mu);position:relative;transition:background .2s,color .2s}
+.ni:hover{background:rgba(201,168,76,.06);color:var(--tx)}
+.ni.on{background:rgba(201,168,76,.1);color:var(--gold)}
+.ni.on::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);border-radius:0 2px 2px 0}
+.ni i{width:16px;text-align:center}
+.sf{padding:18px 22px;border-top:1px solid var(--br)}
+.lob{display:flex;align-items:center;gap:9px;cursor:pointer;color:var(--mu);font-size:.86rem;font-weight:600;background:none;border:none;font-family:"Space Grotesk",sans-serif;transition:color .2s}
+.lob:hover{color:var(--red)}
+/* MAIN */
+.mn{margin-left:250px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+.tb{position:sticky;top:0;z-index:50;background:rgba(8,8,8,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--br);padding:15px 28px;display:flex;align-items:center;justify-content:space-between}
+.tt{font-family:"Syne",sans-serif;font-weight:700;font-size:1.05rem}
+.tbr{display:flex;align-items:center;gap:12px}
+.fbs{display:flex;align-items:center;gap:7px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);padding:6px 14px;border-radius:50px;font-size:.76rem;font-weight:700;color:var(--gold)}
+.vb{display:flex;align-items:center;gap:7px;background:transparent;border:1px solid rgba(201,168,76,.3);color:var(--gold);padding:7px 16px;border-radius:50px;font-size:.78rem;font-weight:700;cursor:pointer;text-decoration:none;transition:background .2s;font-family:"Space Grotesk",sans-serif}
+.vb:hover{background:rgba(201,168,76,.1)}
+/* CONTENT */
+.ct{padding:28px;flex:1}
+.pg{display:none}.pg.on{display:block;animation:fu .4s ease}
+@keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.ph{margin-bottom:24px}.ph h2{font-size:1.7rem;font-weight:800;margin-bottom:4px}.ph p{color:var(--mu);font-size:.86rem}
+/* STATS */
+.sr{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px}
+.sc{background:var(--s1);border:1px solid var(--br);border-radius:var(--r);padding:22px;transition:border-color .3s,transform .2s}
+.sc:hover{border-color:rgba(201,168,76,.3);transform:translateY(-2px)}
+.sc .ic{font-size:1.2rem;color:rgba(201,168,76,.35);margin-bottom:8px}
+.sc .lb{font-size:.68rem;color:var(--mu);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;font-weight:700}
+.sc .nm{font-family:"Syne",sans-serif;font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--gl),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+/* PANEL */
+.pn{background:var(--s1);border:1px solid var(--br);border-radius:var(--r);overflow:hidden;margin-bottom:20px}
+.pnh{padding:16px 22px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between}
+.pnh h3{font-size:.95rem;font-weight:700}
+.pnb{padding:22px}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:50px;font-weight:700;font-size:.8rem;cursor:pointer;border:none;font-family:"Space Grotesk",sans-serif;transition:transform .2s,box-shadow .2s;letter-spacing:.03em}
+.bg2{background:linear-gradient(135deg,var(--gl),var(--gold));color:#080808;box-shadow:0 4px 14px rgba(201,168,76,.25)}.bg2:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(201,168,76,.35)}
+.bo2{background:transparent;border:1px solid rgba(201,168,76,.35);color:var(--gold)}.bo2:hover{background:rgba(201,168,76,.08)}
+.bd2{background:transparent;border:1px solid rgba(232,87,87,.35);color:var(--red)}.bd2:hover{background:rgba(232,87,87,.08)}
+.bsm{padding:6px 14px;font-size:.74rem}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none !important}
+/* FORM */
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg{margin-bottom:16px}
+.fg label{display:block;font-size:.7rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:2px;margin-bottom:7px}
+.fg input,.fg textarea,.fg select{width:100%;padding:12px 15px;border:1px solid var(--br);border-radius:12px;background:var(--s2);color:var(--tx);font-family:"Space Grotesk",sans-serif;font-size:.9rem;outline:none;transition:border-color .3s}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:rgba(201,168,76,.5);box-shadow:0 0 0 3px rgba(201,168,76,.08)}
+.fg textarea{resize:vertical;min-height:85px}
+.fg select option{background:var(--s2)}
+.cc{font-size:.7rem;color:var(--mu);text-align:right;margin-top:3px}
+/* UPLOAD */
+.ua{border:2px dashed rgba(201,168,76,.25);border-radius:14px;padding:28px 18px;text-align:center;cursor:pointer;transition:border-color .3s,background .3s;background:var(--s2);position:relative}
+.ua:hover,.ua.dv{border-color:var(--gold);background:rgba(201,168,76,.05)}
+.ua input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.ua i{font-size:1.8rem;color:rgba(201,168,76,.4);margin-bottom:8px;display:block}
+.ua p{color:var(--mu);font-size:.83rem}.ua span{color:var(--gold);font-weight:700}
+.pw{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.pi{position:relative;width:85px;height:65px;border-radius:9px;overflow:hidden;border:1px solid var(--br)}
+.pi img{width:100%;height:100%;object-fit:cover}
+.rmi{position:absolute;top:3px;right:3px;width:18px;height:18px;background:rgba(0,0,0,.75);border:none;border-radius:50%;cursor:pointer;color:#fff;font-size:.55rem;display:flex;align-items:center;justify-content:center}
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{text-align:left;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--mu);padding:9px 14px;border-bottom:1px solid var(--br)}
+.tbl td{padding:12px 14px;border-bottom:1px solid rgba(201,168,76,.05);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(201,168,76,.02)}
+.th{width:52px;height:40px;border-radius:7px;object-fit:cover;border:1px solid var(--br)}
+.tp{width:52px;height:40px;border-radius:7px;background:var(--s2);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:.65rem}
+.tg{display:inline-block;background:rgba(201,168,76,.1);color:var(--gold);font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:50px;text-transform:uppercase;letter-spacing:1px}
+.sl{color:var(--grn);font-size:.76rem;font-weight:700;display:flex;align-items:center;gap:5px}
+.sl::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--grn)}
+.sd{color:var(--mu);font-size:.76rem;font-weight:700;display:flex;align-items:center;gap:5px}
+.sd::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--mu)}
+.ac{display:flex;gap:7px;align-items:center}
+/* MODAL */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:flex;align-items:center;justify-content:center;padding:18px;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s;backdrop-filter:blur(4px)}
+.mo.open{opacity:1;visibility:visible}
+.mb{background:var(--s1);border:1px solid var(--br);border-radius:22px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;transform:translateY(18px);transition:transform .3s}
+.mo.open .mb{transform:translateY(0)}
+.mh{padding:22px 26px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--s1);z-index:1}
+.mh h3{font-size:1.1rem;font-weight:800}
+.mc{background:none;border:none;color:var(--mu);cursor:pointer;font-size:1.1rem;padding:3px;transition:color .2s}.mc:hover{color:var(--tx)}
+.mbd{padding:26px}
+.mf{padding:18px 26px;border-top:1px solid var(--br);display:flex;gap:10px;justify-content:flex-end}
+/* TOAST */
+.tw{position:fixed;bottom:24px;right:24px;z-index:9000;display:flex;flex-direction:column;gap:9px}
+.ts{background:var(--s1);border:1px solid var(--br);border-radius:13px;padding:13px 18px;display:flex;align-items:center;gap:11px;box-shadow:0 10px 36px rgba(0,0,0,.4);min-width:240px;animation:ti .3s ease;font-size:.86rem;font-weight:600}
+.ts.ok{border-color:rgba(37,211,102,.3)}.ts.ok .ti{color:var(--grn)}
+.ts.er{border-color:rgba(232,87,87,.3)}.ts.er .ti{color:var(--red)}
+.ts.in{border-color:rgba(201,168,76,.3)}.ts.in .ti{color:var(--gold)}
+@keyframes ti{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:translateX(0)}}
+/* EMPTY / LOADING */
+.em{text-align:center;padding:36px 18px;color:var(--mu)}
+.em i{font-size:2rem;margin-bottom:10px;display:block;opacity:.25}
+.lo{text-align:center;padding:28px;color:var(--mu);font-size:.9rem}
+.lo i{color:var(--gold);margin-right:7px;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:768px){.sb{transform:translateX(-100%)}.mn{margin-left:0}.fr{grid-template-columns:1fr}.ct{padding:18px}.dg{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="lb">
+    <div class="ll">S.Saadi</div>
+    <div class="ls">Portfolio Admin Panel</div>
+    <div class="lf"><label>Username</label><input type="text" id="lu" placeholder="admin" autocomplete="username"></div>
+    <div class="lf"><label>Password</label><input type="password" id="lp" placeholder="••••••••" autocomplete="current-password"></div>
+    <button class="lbtn" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Login</button>
+    <div class="lerr" id="lerr">Wrong username or password</div>
+    <div class="dbs"><div class="dbd" id="dbd"></div><span id="dbt">Connecting to Firebase...</span></div>
+  </div>
+</div>
+
+<aside class="sb">
+  <div class="sbr"><div class="b">S<span>.</span>Saadi</div><div class="s">Admin Dashboard</div></div>
+  <nav class="sn">
+    <div class="sg">Main</div>
+    <div class="ni on" onclick="gp('dash',this)"><i class="fas fa-th-large"></i> Dashboard</div>
+    <div class="ni" onclick="gp('projects',this)"><i class="fas fa-folder-open"></i> All Projects</div>
+    <div class="ni" onclick="gp('add',this)"><i class="fas fa-plus-circle"></i> Add Project</div>
+  </nav>
+  <div class="sf"><button class="lob" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
+</aside>
+
+<div class="mn">
+  <div class="tb">
+    <span class="tt" id="tt">Dashboard</span>
+    <div class="tbr">
+      <div class="fbs"><div class="dbd" id="tdbd"></div><span id="tdbt">Firebase</span></div>
+      <a href="index.html" target="_blank" class="vb"><i class="fas fa-external-link-alt"></i> View Portfolio</a>
+    </div>
+  </div>
+  <div class="ct">
+
+    <!-- DASHBOARD -->
+    <div class="pg on" id="pg-dash">
+      <div class="ph"><h2>Welcome back, Saadi 👋</h2><p>Your portfolio overview</p></div>
+      <div class="sr">
+        <div class="sc"><div class="ic"><i class="fas fa-folder"></i></div><div class="lb">Total</div><div class="nm" id="stT">—</div></div>
+        <div class="sc"><div class="ic"><i class="fas fa-eye"></i></div><div class="lb">Live</div><div class="nm" id="stL">—</div></div>
+        <div class="sc"><div class="ic"><i class="fas fa-drafting-compass"></i></div><div class="lb">Drafts</div><div class="nm" id="stD">—</div></div>
+      </div>
+      <div class="dg">
+        <div class="pn">
+          <div class="pnh"><h3><i class="fas fa-clock" style="color:var(--gold);margin-right:7px"></i>Recent Projects</h3><button class="btn bo2 bsm" onclick="gp('add',null)"><i class="fas fa-plus"></i> Add</button></div>
+          <div class="pnb" id="rp"><div class="lo"><i class="fas fa-spinner"></i>Loading...</div></div>
+        </div>
+        <div class="pn">
+          <div class="pnh"><h3><i class="fas fa-fire" style="color:#f59e0b;margin-right:7px"></i>Firebase Status</h3></div>
+          <div class="pnb" id="fbst"><div class="lo"><i class="fas fa-spinner"></i>Checking...</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL PROJECTS -->
+    <div class="pg" id="pg-projects">
+      <div class="ph" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div><h2>All Projects</h2><p>Manage your portfolio projects</p></div>
+        <button class="btn bg2" onclick="gp('add',null)"><i class="fas fa-plus"></i> Add New</button>
+      </div>
+      <div style="display:flex;gap:9px;margin-bottom:18px;flex-wrap:wrap">
+        <button class="btn bg2 bsm" onclick="filt('all',this)" id="fall">All</button>
+        <button class="btn bo2 bsm" onclick="filt('live',this)">Live</button>
+        <button class="btn bo2 bsm" onclick="filt('draft',this)">Draft</button>
+      </div>
+      <div class="pn"><div class="pnb" style="padding:0;overflow-x:auto"><div id="tw2"></div></div></div>
+    </div>
+
+    <!-- ADD PROJECT -->
+    <div class="pg" id="pg-add">
+      <div class="ph"><h2 id="addH">Add New Project</h2><p>Fill in details and upload screenshot</p></div>
+      <div class="pn"><div class="pnb">
+        <input type="hidden" id="eid">
+        <div class="fr">
+          <div class="fg"><label>Title *</label><input type="text" id="pt" placeholder="e.g. Spice Garden Restaurant" maxlength="60" oninput="cc(this,'tc',60)"><div class="cc"><span id="tc">0</span>/60</div></div>
+          <div class="fg"><label>Category *</label>
+            <select id="pc"><option value="">Select...</option><option>Restaurant</option><option>Beauty Salon</option><option>Fitness</option><option>Real Estate</option><option>Education</option><option>E-commerce</option><option>Business</option><option>Healthcare</option><option>Other</option></select>
+          </div>
+        </div>
+        <div class="fg"><label>Description *</label><textarea id="pd" placeholder="Describe the project..." maxlength="220" oninput="cc(this,'dc',220)"></textarea><div class="cc"><span id="dc">0</span>/220</div></div>
+        <div class="fr">
+          <div class="fg"><label>Live Demo URL</label><input type="url" id="pu" placeholder="https://example.com"></div>
+          <div class="fg"><label>Status</label><select id="ps"><option value="live">Live</option><option value="draft">Draft</option></select></div>
+        </div>
+        <div class="fg">
+          <label>Screenshot (Max 1MB)</label>
+          <div class="ua" id="upa" ondragover="dov(event)" ondragleave="dlv()" ondrop="ddp(event)">
+            <input type="file" id="fi" accept="image/*" onchange="imgSel(event)">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Drag & drop or <span>click to upload</span></p>
+            <p style="font-size:.73rem;margin-top:3px;opacity:.55">PNG, JPG, WEBP — Max 1MB</p>
+          </div>
+          <div class="pw" id="pw"></div>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px">
+          <button class="btn bo2" onclick="cancelE()">Cancel</button>
+          <button class="btn bg2" id="svBtn" onclick="saveProj()"><i class="fas fa-save"></i> Save to Firebase</button>
+        </div>
+      </div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="mo" id="emod">
+  <div class="mb">
+    <div class="mh"><h3>Edit Project</h3><button class="mc" onclick="closeE()"><i class="fas fa-times"></i></button></div>
+    <div class="mbd">
+      <div class="fr">
+        <div class="fg"><label>Title *</label><input type="text" id="mt" maxlength="60"></div>
+        <div class="fg"><label>Category *</label><select id="mcat"><option>Restaurant</option><option>Beauty Salon</option><option>Fitness</option><option>Real Estate</option><option>Education</option><option>E-commerce</option><option>Business</option><option>Healthcare</option><option>Other</option></select></div>
+      </div>
+      <div class="fg"><label>Description *</label><textarea id="md" maxlength="220" style="min-height:75px"></textarea></div>
+      <div class="fr">
+        <div class="fg"><label>Demo URL</label><input type="url" id="mu"></div>
+        <div class="fg"><label>Status</label><select id="mst"><option value="live">Live</option><option value="draft">Draft</option></select></div>
+      </div>
+      <div class="fg">
+        <label>Replace Screenshot</label>
+        <div class="ua" style="padding:16px"><input type="file" id="mfi" accept="image/*" onchange="mImgSel(event)"><i class="fas fa-image"></i><p style="font-size:.82rem">Click to replace</p></div>
+        <div id="mip" style="margin-top:10px"></div>
+      </div>
+    </div>
+    <div class="mf"><button class="btn bo2" onclick="closeE()">Cancel</button><button class="btn bg2" id="updBtn" onclick="updProj()"><i class="fas fa-save"></i> Save</button></div>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="mo" id="dmod">
+  <div class="mb" style="max-width:380px">
+    <div class="mh"><h3>Delete Project</h3><button class="mc" onclick="closeD()"><i class="fas fa-times"></i></button></div>
+    <div class="mbd" style="text-align:center;padding:32px 24px">
+      <i class="fas fa-trash-alt" style="font-size:2.3rem;color:var(--red);margin-bottom:14px;display:block"></i>
+      <h3 style="margin-bottom:8px">Are you sure?</h3>
+      <p style="color:var(--mu);font-size:.87rem">Delete "<span id="dn" style="color:var(--tx);font-weight:700"></span>"?</p>
+    </div>
+    <div class="mf"><button class="btn bo2" onclick="closeD()">Cancel</button><button class="btn bd2" onclick="confD()"><i class="fas fa-trash"></i> Delete</button></div>
+  </div>
+</div>
+
+<div class="tw" id="twrap"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, orderBy, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+// ── FIREBASE CONFIG ──────────────────────────────────────────
+const FB = {
+  "apiKey": "AIzaSyC0fetGvPZs_mjbK3zIxB_NaiouuADfQtQ",
+  "authDomain": "educentral-yz88l.firebaseapp.com",
+  "projectId": "educentral-yz88l",
+  "storageBucket": "educentral-yz88l.firebasestorage.app",
+  "messagingSenderId": "614628314650",
+  "appId": "1:614628314650:web:cef50e2142ce11f1e50ba3"
+};
+const app = initializeApp(FB);
+const db  = getFirestore(app);
+
+// ── GLOBALS ──────────────────────────────────────────────────
+let all = [];
+let curF = 'all';
+let editId = null;
+let delId  = null;
+let curImg = null;
+let mImg   = null;
+let adminPass = localStorage.getItem('ss_pass') || 'saadi1234';
+
+// ── FIREBASE CHECK ───────────────────────────────────────────
+async function checkFB() {
+  try {
+    await getDocs(collection(db, 'projects'));
+    setDbUI(true);
+  } catch(e) {
+    setDbUI(false);
+    console.error('Firebase error:', e);
+  }
+}
+
+function setDbUI(ok) {
+  const d1 = document.getElementById('dbd');
+  const t1 = document.getElementById('dbt');
+  const d2 = document.getElementById('tdbd');
+  const t2 = document.getElementById('tdbt');
+  const fb = document.getElementById('fbst');
+  if (ok) {
+    d1.className = 'dbd ok'; t1.textContent = 'Firebase Connected ✓';
+    d2.className = 'dbd ok'; t2.textContent = 'Firebase Live';
+    fb.innerHTML = `<div style="display:flex;align-items:center;gap:12px;padding:14px;background:rgba(37,211,102,.07);border:1px solid rgba(37,211,102,.2);border-radius:12px">
+      <i class="fas fa-check-circle" style="color:var(--grn);font-size:1.3rem"></i>
+      <div><div style="font-weight:700;color:var(--grn)">Connected!</div>
+      <div style="font-size:.82rem;color:var(--mu);margin-top:2px">Projects save permanently. Portfolio loads from Firebase.</div></div></div>`;
+  } else {
+    d1.className = 'dbd err'; t1.textContent = 'Firebase Error — Check Console';
+    d2.className = 'dbd err'; t2.textContent = 'Firebase Error';
+    fb.innerHTML = `<div style="display:flex;align-items:center;gap:12px;padding:14px;background:rgba(232,87,87,.07);border:1px solid rgba(232,87,87,.2);border-radius:12px">
+      <i class="fas fa-times-circle" style="color:var(--red);font-size:1.3rem"></i>
+      <div><div style="font-weight:700;color:var(--red)">Connection Error</div>
+      <div style="font-size:.82rem;color:var(--mu);margin-top:2px">Check Firestore rules — set to public read/write in test mode.</div></div></div>`;
+  }
+}
+
+checkFB();
+
+// ── AUTH ─────────────────────────────────────────────────────
+window.doLogin = function() {
+  const u = document.getElementById('lu').value.trim();
+  const p = document.getElementById('lp').value;
+  if (u === 'admin' && p === adminPass) {
+    document.getElementById('login').classList.add('hide');
+    toast('Welcome back, Saadi! 👋', 'ok');
+    loadDash();
+  } else {
+    document.getElementById('lerr').style.display = 'block';
+    document.getElementById('lp').style.borderColor = 'var(--red)';
+    setTimeout(() => document.getElementById('lp').style.borderColor = '', 2000);
+  }
+};
+document.getElementById('lp').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+window.doLogout = function() {
+  document.getElementById('login').classList.remove('hide');
+  document.getElementById('lu').value = '';
+  document.getElementById('lp').value = '';
+};
+
+// ── NAV ──────────────────────────────────────────────────────
+window.gp = function(id, el) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
+  document.getElementById('pg-' + id).classList.add('on');
+  if (el) el.classList.add('on');
+  const T = { dash:'Dashboard', projects:'All Projects', add:'Add Project' };
+  document.getElementById('tt').textContent = T[id] || id;
+  if (id === 'projects') loadTbl();
+  if (id === 'dash') loadDash();
+  if (id === 'add') resetForm();
+};
+
+// ── LOAD FROM FIREBASE ───────────────────────────────────────
+async function loadProjs() {
+  try {
+    const q = query(collection(db, 'projects'), orderBy('createdAt', 'desc'));
+    const snap = await getDocs(q);
+    all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    return all;
+  } catch(e) {
+    console.error(e);
+    return [];
+  }
+}
+
+// ── DASHBOARD ────────────────────────────────────────────────
+async function loadDash() {
+  document.getElementById('stT').textContent = '…';
+  document.getElementById('stL').textContent = '…';
+  document.getElementById('stD').textContent = '…';
+  document.getElementById('rp').innerHTML = '<div class="lo"><i class="fas fa-spinner"></i>Loading...</div>';
+  const p = await loadProjs();
+  document.getElementById('stT').textContent = p.length;
+  document.getElementById('stL').textContent = p.filter(x => x.status === 'live').length;
+  document.getElementById('stD').textContent = p.filter(x => x.status === 'draft').length;
+  const rp = document.getElementById('rp');
+  const recent = p.slice(0, 4);
+  if (!recent.length) {
+    rp.innerHTML = '<div class="em"><i class="fas fa-folder-open"></i><p>No projects yet</p></div>';
+    return;
+  }
+  rp.innerHTML = recent.map(r => `
+    <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(201,168,76,.05)">
+      ${r.image ? `<img src="${r.image}" style="width:48px;height:37px;border-radius:7px;object-fit:cover;border:1px solid var(--br);flex-shrink:0">` : `<div style="width:48px;height:37px;border-radius:7px;background:var(--s2);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-image" style="color:var(--mu)"></i></div>`}
+      <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.87rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.title}</div><div style="color:var(--mu);font-size:.73rem;margin-top:1px">${r.category}</div></div>
+      <div class="${r.status === 'live' ? 'sl' : 'sd'}">${r.status === 'live' ? 'Live' : 'Draft'}</div>
+    </div>`).join('');
+}
+
+// ── TABLE ────────────────────────────────────────────────────
+async function loadTbl(f) {
+  f = f || curF;
+  document.getElementById('tw2').innerHTML = '<div class="lo"><i class="fas fa-spinner"></i>Loading...</div>';
+  let p = await loadProjs();
+  if (f !== 'all') p = p.filter(x => x.status === f);
+  const w = document.getElementById('tw2');
+  if (!p.length) {
+    w.innerHTML = '<div class="em" style="padding:36px"><i class="fas fa-folder-open"></i><p>No projects found</p></div>';
+    return;
+  }
+  w.innerHTML = `<table class="tbl"><thead><tr><th>Screenshot</th><th>Title</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+    ${p.map(x => `<tr>
+      <td>${x.image ? `<img src="${x.image}" class="th">` : `<div class="tp"><i class="fas fa-image"></i></div>`}</td>
+      <td style="max-width:180px"><div style="font-weight:600;font-size:.86rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x.title}</div><div style="color:var(--mu);font-size:.73rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px;margin-top:1px">${x.desc}</div></td>
+      <td><span class="tg">${x.category}</span></td>
+      <td><div class="${x.status === 'live' ? 'sl' : 'sd'}">${x.status === 'live' ? 'Live' : 'Draft'}</div></td>
+      <td><div class="ac">
+        ${x.url ? `<a href="${x.url}" target="_blank" class="btn bo2 bsm"><i class="fas fa-external-link-alt"></i></a>` : ''}
+        <button class="btn bo2 bsm" onclick="openE('${x.id}')"><i class="fas fa-pen"></i></button>
+        <button class="btn bd2 bsm" onclick="openD('${x.id}','${x.title.replace(/'/g,"\'")}')"><i class="fas fa-trash"></i></button>
+      </div></td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+
+window.filt = function(t, btn) {
+  curF = t;
+  document.querySelectorAll('[onclick^="filt"]').forEach(b => b.className = 'btn bo2 bsm');
+  btn.className = 'btn bg2 bsm';
+  loadTbl(t);
+};
+
+// ── ADD PROJECT ──────────────────────────────────────────────
+function resetForm() {
+  document.getElementById('eid').value = '';
+  document.getElementById('addH').textContent = 'Add New Project';
+  ['pt','pd','pu'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('pc').value = '';
+  document.getElementById('ps').value = 'live';
+  document.getElementById('pw').innerHTML = '';
+  document.getElementById('tc').textContent = '0';
+  document.getElementById('dc').textContent = '0';
+  curImg = null;
+}
+window.cancelE = () => { resetForm(); gp('projects', document.querySelectorAll('.ni')[1]); };
+window.cc = (el, cid, max) => { document.getElementById(cid).textContent = el.value.length; };
+
+function readImg(file, cb) {
+  if (file.size > 1024 * 1024) { toast('Max 1MB per image', 'er'); return; }
+  const r = new FileReader();
+  r.onload = e => cb(e.target.result);
+  r.readAsDataURL(file);
+}
+
+window.imgSel = e => {
+  const f = e.target.files[0]; if (!f) return;
+  readImg(f, data => { curImg = data; document.getElementById('pw').innerHTML = `<div class="pi"><img src="${data}"><button class="rmi" onclick="remImg()"><i class="fas fa-times"></i></button></div>`; });
+};
+window.remImg = () => { curImg = null; document.getElementById('pw').innerHTML = ''; document.getElementById('fi').value = ''; };
+window.dov = e => { e.preventDefault(); document.getElementById('upa').classList.add('dv'); };
+window.dlv = () => document.getElementById('upa').classList.remove('dv');
+window.ddp = e => {
+  e.preventDefault(); dlv();
+  const f = e.dataTransfer.files[0];
+  if (!f || !f.type.startsWith('image/')) { toast('Please drop an image', 'er'); return; }
+  readImg(f, data => { curImg = data; document.getElementById('pw').innerHTML = `<div class="pi"><img src="${data}"><button class="rmi" onclick="remImg()"><i class="fas fa-times"></i></button></div>`; });
+};
+
+window.saveProj = async function() {
+  const title  = document.getElementById('pt').value.trim();
+  const cat    = document.getElementById('pc').value;
+  const desc   = document.getElementById('pd').value.trim();
+  const url    = document.getElementById('pu').value.trim();
+  const status = document.getElementById('ps').value;
+  if (!title) { toast('Title is required', 'er'); return; }
+  if (!cat)   { toast('Select a category', 'er'); return; }
+  if (!desc)  { toast('Description is required', 'er'); return; }
+  const btn = document.getElementById('svBtn');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+  try {
+    await addDoc(collection(db, 'projects'), { title, category: cat, desc, url, status, image: curImg || null, createdAt: Date.now() });
+    toast('Project saved to Firebase! ✓', 'ok');
+    resetForm();
+    gp('projects', document.querySelectorAll('.ni')[1]);
+  } catch(e) {
+    toast('Save failed: ' + e.message, 'er');
+    console.error(e);
+  }
+  btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Save to Firebase';
+};
+
+// ── EDIT ─────────────────────────────────────────────────────
+window.openE = function(id) {
+  const p = all.find(x => x.id === id); if (!p) return;
+  editId = id; mImg = p.image || null;
+  document.getElementById('mt').value  = p.title;
+  document.getElementById('mcat').value = p.category;
+  document.getElementById('md').value  = p.desc;
+  document.getElementById('mu').value  = p.url || '';
+  document.getElementById('mst').value = p.status;
+  document.getElementById('mip').innerHTML = p.image ? `<img src="${p.image}" style="width:75px;height:58px;object-fit:cover;border-radius:8px;border:1px solid var(--br)">` : '';
+  document.getElementById('emod').classList.add('open');
+};
+window.mImgSel = e => {
+  const f = e.target.files[0]; if (!f) return;
+  readImg(f, data => { mImg = data; document.getElementById('mip').innerHTML = `<img src="${data}" style="width:75px;height:58px;object-fit:cover;border-radius:8px;border:1px solid var(--br)">`; });
+};
+window.updProj = async function() {
+  const title = document.getElementById('mt').value.trim();
+  const cat   = document.getElementById('mcat').value;
+  const desc  = document.getElementById('md').value.trim();
+  const url   = document.getElementById('mu').value.trim();
+  const status = document.getElementById('mst').value;
+  if (!title) { toast('Title required', 'er'); return; }
+  const btn = document.getElementById('updBtn');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+  try {
+    const orig = all.find(x => x.id === editId);
+    await updateDoc(doc(db, 'projects', editId), { title, category: cat, desc, url, status, image: mImg || (orig ? orig.image : null), updatedAt: Date.now() });
+    toast('Updated! ✓', 'ok');
+    closeE(); loadTbl(); loadDash();
+  } catch(e) { toast('Update failed: ' + e.message, 'er'); }
+  btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Save';
+};
+window.closeE = () => { document.getElementById('emod').classList.remove('open'); editId = null; mImg = null; document.getElementById('mfi').value = ''; };
+
+// ── DELETE ───────────────────────────────────────────────────
+window.openD = (id, name) => { delId = id; document.getElementById('dn').textContent = name; document.getElementById('dmod').classList.add('open'); };
+window.closeD = () => { document.getElementById('dmod').classList.remove('open'); delId = null; };
+window.confD = async function() {
+  try {
+    await deleteDoc(doc(db, 'projects', delId));
+    toast('Deleted', 'in'); closeD(); loadTbl(); loadDash();
+  } catch(e) { toast('Delete failed: ' + e.message, 'er'); }
+};
+
+// ── TOAST ────────────────────────────────────────────────────
+window.toast = function(msg, type) {
+  const ic = { ok:'fa-check-circle', er:'fa-exclamation-circle', in:'fa-info-circle' };
+  const tc = { ok:'ok', er:'er', in:'in' };
+  const w = document.getElementById('twrap');
+  const t = document.createElement('div'); t.className = 'ts ' + (tc[type]||'in');
+  t.innerHTML = `<i class="fas ${ic[type]||ic.in} ti"></i><span>${msg}</span>`;
+  w.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(18px)'; t.style.transition='.3s'; setTimeout(()=>t.remove(),350); }, 3500);
+};
+
+document.getElementById('emod').addEventListener('click', e => { if(e.target===document.getElementById('emod')) closeE(); });
+document.getElementById('dmod').addEventListener('click', e => { if(e.target===document.getElementById('dmod')) closeD(); });
+</script>
+</body>
+</html>
