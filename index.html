@@ -426,7 +426,7 @@ footer p{font-size:.78rem;color:var(--muted);margin-top:4px;font-family:'Space G
       <p>Reach out via WhatsApp, email, or fill the form. I&rsquo;ll get back within a few hours.</p>
       <div class="contact-items">
         <div class="contact-item"><div class="ci-icon"><i class="fab fa-whatsapp"></i></div><div class="ci-text"><div class="ci-label">WhatsApp</div><div class="ci-value">+880 1646-635420</div></div></div>
-        <div class="contact-item"><div class="ci-icon"><i class="fas fa-envelope"></i></div><div class="ci-text"><div class="ci-label">Email</div><div class="ci-value">sheikhsaadi@email.com</div></div></div>
+        <div class="contact-item"><div class="ci-icon"><i class="fas fa-envelope"></i></div><div class="ci-text"><div class="ci-label">Email</div><div class="ci-value"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b7c4dfd2dedcdfc4d6d6d3def7d2dad6dedb99d4d8da">[email&#160;protected]</a></div></div></div>
         <div class="contact-item"><div class="ci-icon"><i class="fas fa-phone"></i></div><div class="ci-text"><div class="ci-label">Phone</div><div class="ci-value">+880 1646-635420</div></div></div>
       </div>
       <a href="https://wa.me/8801646635420" class="whatsapp-btn" target="_blank"><i class="fab fa-whatsapp"></i> Chat on WhatsApp</a>
@@ -447,11 +447,11 @@ footer p{font-size:.78rem;color:var(--muted);margin-top:4px;font-family:'Space G
     <a href="https://wa.me/8801646635420" target="_blank"><i class="fab fa-whatsapp"></i></a>
     <a href="#"><i class="fab fa-facebook"></i></a>
     <a href="#"><i class="fab fa-linkedin"></i></a>
-    <a href="mailto:sheikhsaadi@email.com"><i class="fas fa-envelope"></i></a>
+    <a href="/cdn-cgi/l/email-protection#e5968d808c8e8d968484818ca58088848c89cb868a88"><i class="fas fa-envelope"></i></a>
   </div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // LOADER
 (function(){
   var loader=document.getElementById('loader'),bar=document.getElementById('loaderBar'),pct=document.getElementById('loaderPct'),fill=document.getElementById('nameFill');
@@ -550,11 +550,15 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, collection, getDocs, orderBy, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 async function loadPortfolioProjects() {
-  const saved = localStorage.getItem('ss_fb_config');
-  if (!saved) return; // No Firebase config, show static projects
-
-  let cfg;
-  try { cfg = JSON.parse(saved); } catch(e) { return; }
+  // Firebase config — hardcoded for GitHub hosting
+  const cfg = {
+    apiKey: "AIzaSyC0fetGvPZs_mjbK3zIxB_NaiouuADfQtQ",
+    authDomain: "educentral-yz88l.firebaseapp.com",
+    projectId: "educentral-yz88l",
+    storageBucket: "educentral-yz88l.firebasestorage.app",
+    messagingSenderId: "614628314650",
+    appId: "1:614628314650:web:cef50e2142ce11f1e50ba3"
+  };
 
   let db;
   try {
@@ -609,18 +613,4 @@ async function loadPortfolioProjects() {
     grid.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
   } catch(e) {
-    console.log('Portfolio Firebase load error:', e.message);
-    // Silently fail — static projects remain visible
-  }
-}
-
-// Load after DOM ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', loadPortfolioProjects);
-} else {
-  loadPortfolioProjects();
-}
-</script>
-
-</body>
-</html>
+    console.log('Portfolio Firebase load error:', 
