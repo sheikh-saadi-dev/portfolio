@@ -3,951 +3,829 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel — Sheikh Saadi</title>
+<title>Admin — Sheikh Saadi</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-:root{--gold:#c9a84c;--gl:#e8c87a;--gd:#9a7a2e;--ink:#080808;--s1:#0f0f0f;--s2:#161616;--s3:#1e1e1e;--mu:#777;--br:rgba(201,168,76,0.15);--tx:#e8e8e8;--red:#e85757;--grn:#25d366;--r:14px}
+:root{--gold:#c9a84c;--gl:#e8c87a;--ink:#080808;--s1:#0f0f0f;--s2:#161616;--s3:#1e1e1e;--mu:#777;--br:rgba(201,168,76,.15);--tx:#e8e8e8;--red:#e85757;--grn:#25d366;--r:14px}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:"Space Grotesk",sans-serif;background:var(--ink);color:var(--tx);min-height:100vh;display:flex}
 h1,h2,h3{font-family:"Syne",sans-serif}
 
-/* ── LOGIN OVERLAY ─────────────────────────────────────────── */
-#login{position:fixed;inset:0;z-index:9999;background:var(--ink);display:flex;align-items:center;justify-content:center;transition:opacity .5s,visibility .5s}
-#login.hide{opacity:0;visibility:hidden;pointer-events:none}
-.lb-box{width:100%;max-width:400px;padding:48px 40px;background:var(--s1);border:1px solid var(--br);border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,.6);text-align:center}
-.lb-title{font-family:"Syne",sans-serif;font-weight:800;font-size:2rem;background:linear-gradient(135deg,var(--gl),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
-.lb-sub{color:var(--mu);font-size:.85rem;margin-bottom:32px}
-.lf{margin-bottom:16px;text-align:left}
-.lf label{display:block;font-size:.72rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
-.lf input{width:100%;padding:13px 16px;border:1px solid var(--br);border-radius:12px;background:var(--s2);color:var(--tx);font-family:"Space Grotesk",sans-serif;font-size:.92rem;outline:none;transition:border-color .3s}
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;z-index:9999;background:var(--ink);display:flex;align-items:center;justify-content:center;transition:opacity .5s,visibility .5s}
+#loginScreen.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.lbox{width:100%;max-width:400px;padding:48px 40px;background:var(--s1);border:1px solid var(--br);border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,.6);text-align:center}
+.llogo{font-family:"Syne",sans-serif;font-weight:800;font-size:2rem;background:linear-gradient(135deg,var(--gl),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.lsub{color:var(--mu);font-size:.85rem;margin-bottom:28px}
+.lf{margin-bottom:14px;text-align:left}
+.lf label{display:block;font-size:.7rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:2px;margin-bottom:7px}
+.lf input{width:100%;padding:13px 16px;border:1px solid var(--br);border-radius:12px;background:var(--s2);color:var(--tx);font-family:"Space Grotesk",sans-serif;font-size:.92rem;outline:none;transition:border-color .3s,box-shadow .3s}
 .lf input:focus{border-color:rgba(201,168,76,.5);box-shadow:0 0 0 3px rgba(201,168,76,.08)}
-.lbtn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gl),var(--gold));color:#080808;border:none;border-radius:50px;font-weight:700;font-size:.95rem;cursor:pointer;font-family:"Space Grotesk",sans-serif;margin-top:8px;transition:transform .2s,box-shadow .2s;box-shadow:0 6px 20px rgba(201,168,76,.3)}
+.lbtn{width:100%;padding:14px;margin-top:10px;background:linear-gradient(135deg,var(--gl),var(--gold));color:#080808;border:none;border-radius:50px;font-weight:700;font-size:.95rem;cursor:pointer;font-family:"Space Grotesk",sans-serif;transition:transform .2s,box-shadow .2s;box-shadow:0 6px 20px rgba(201,168,76,.3)}
 .lbtn:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(201,168,76,.4)}
+.lbtn:disabled{opacity:.6;cursor:not-allowed;transform:none}
 .lerr{color:var(--red);font-size:.82rem;margin-top:10px;display:none}
-.db-status{margin-top:14px;font-size:.78rem;display:flex;align-items:center;justify-content:center;gap:7px;color:var(--mu)}
-.db-dot{width:8px;height:8px;border-radius:50%;background:var(--mu);flex-shrink:0}
-.db-dot.ok{background:var(--grn);animation:pulse 2s infinite}
-.db-dot.err{background:var(--red)}
+.lbadge{margin-top:16px;font-size:.75rem;color:var(--mu);display:flex;align-items:center;justify-content:center;gap:6px}
+.ldot{width:7px;height:7px;border-radius:50%;background:var(--grn);animation:pulse 2s infinite;flex-shrink:0}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* ── SIDEBAR ───────────────────────────────────────────────── */
-.sb{width:250px;background:var(--s1);border-right:1px solid var(--br);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
-.sb-brand{padding:26px 22px 18px;border-bottom:1px solid var(--br)}
-.sb-brand .b{font-family:"Syne",sans-serif;font-weight:800;font-size:1.15rem}
-.sb-brand .b span{color:var(--gold)}
-.sb-brand .s{font-size:.7rem;color:var(--mu);margin-top:2px}
-.sb-nav{flex:1;padding:14px 0}
-.sb-group{font-size:.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--mu);padding:10px 22px 4px}
-.nav-item{display:flex;align-items:center;gap:11px;padding:11px 22px;cursor:pointer;font-size:.86rem;font-weight:600;color:var(--mu);position:relative;transition:background .2s,color .2s}
-.nav-item:hover{background:rgba(201,168,76,.06);color:var(--tx)}
-.nav-item.on{background:rgba(201,168,76,.1);color:var(--gold)}
-.nav-item.on::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);border-radius:0 2px 2px 0}
-.nav-item i{width:16px;text-align:center}
-.sb-foot{padding:18px 22px;border-top:1px solid var(--br)}
-.logout-btn{display:flex;align-items:center;gap:9px;cursor:pointer;color:var(--mu);font-size:.86rem;font-weight:600;background:none;border:none;font-family:"Space Grotesk",sans-serif;transition:color .2s}
-.logout-btn:hover{color:var(--red)}
+/* SIDEBAR */
+.sidebar{width:250px;background:var(--s1);border-right:1px solid var(--br);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.sbrand{padding:26px 22px 18px;border-bottom:1px solid var(--br)}
+.sbrand .nm{font-family:"Syne",sans-serif;font-weight:800;font-size:1.15rem}.sbrand .nm span{color:var(--gold)}
+.sbrand .sub{font-size:.7rem;color:var(--mu);margin-top:2px}
+.snav{flex:1;padding:14px 0;overflow-y:auto}
+.sg{font-size:.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--mu);padding:10px 22px 4px}
+.ni{display:flex;align-items:center;gap:11px;padding:11px 22px;cursor:pointer;font-size:.86rem;font-weight:600;color:var(--mu);position:relative;transition:background .2s,color .2s}
+.ni:hover{background:rgba(201,168,76,.06);color:var(--tx)}
+.ni.on{background:rgba(201,168,76,.1);color:var(--gold)}
+.ni.on::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);border-radius:0 2px 2px 0}
+.ni i{width:16px;text-align:center}
+.sfoot{padding:18px 22px;border-top:1px solid var(--br)}
+.lob{display:flex;align-items:center;gap:9px;cursor:pointer;color:var(--mu);font-size:.86rem;font-weight:600;background:none;border:none;font-family:"Space Grotesk",sans-serif;transition:color .2s}
+.lob:hover{color:var(--red)}
 
-/* ── TOPBAR ────────────────────────────────────────────────── */
-.main-wrap{margin-left:250px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+/* MAIN */
+.main{margin-left:250px;flex:1;min-height:100vh;display:flex;flex-direction:column}
 .topbar{position:sticky;top:0;z-index:50;background:rgba(8,8,8,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--br);padding:15px 28px;display:flex;align-items:center;justify-content:space-between}
-.topbar-title{font-family:"Syne",sans-serif;font-weight:700;font-size:1.05rem}
-.topbar-right{display:flex;align-items:center;gap:12px}
-.fb-badge{display:flex;align-items:center;gap:7px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);padding:6px 14px;border-radius:50px;font-size:.76rem;font-weight:700;color:var(--gold)}
-.view-btn{display:flex;align-items:center;gap:7px;background:transparent;border:1px solid rgba(201,168,76,.3);color:var(--gold);padding:7px 16px;border-radius:50px;font-size:.78rem;font-weight:700;cursor:pointer;text-decoration:none;transition:background .2s;font-family:"Space Grotesk",sans-serif}
-.view-btn:hover{background:rgba(201,168,76,.1)}
+.ttitle{font-family:"Syne",sans-serif;font-weight:700;font-size:1.05rem}
+.tbr{display:flex;align-items:center;gap:11px}
+.gh-badge{display:flex;align-items:center;gap:7px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);padding:6px 14px;border-radius:50px;font-size:.76rem;font-weight:700;color:var(--gold)}
+.gh-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--mu);flex-shrink:0}
+.gh-badge .dot.ok{background:var(--grn);animation:pulse 2s infinite}
+.gh-badge .dot.er{background:var(--red)}
+.vbtn{display:flex;align-items:center;gap:7px;text-decoration:none;background:transparent;border:1px solid rgba(201,168,76,.3);color:var(--gold);padding:7px 16px;border-radius:50px;font-size:.78rem;font-weight:700;cursor:pointer;transition:background .2s;font-family:"Space Grotesk",sans-serif}
+.vbtn:hover{background:rgba(201,168,76,.1)}
 
-/* ── CONTENT ───────────────────────────────────────────────── */
-.content{padding:28px;flex:1}
-.page{display:none}
-.page.on{display:block;animation:fadeUp .4s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.page-header{margin-bottom:24px}
-.page-header h2{font-size:1.7rem;font-weight:800;margin-bottom:4px}
-.page-header p{color:var(--mu);font-size:.86rem}
+/* CONTENT */
+.ct{padding:28px;flex:1}
+.pg{display:none}.pg.on{display:block;animation:fu .4s ease}
+@keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.ph{margin-bottom:24px}.ph h2{font-size:1.7rem;font-weight:800;margin-bottom:4px}.ph p{color:var(--mu);font-size:.86rem}
 
-/* ── STATS ─────────────────────────────────────────────────── */
-.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px}
-.stat-card{background:var(--s1);border:1px solid var(--br);border-radius:var(--r);padding:22px;transition:border-color .3s,transform .2s}
-.stat-card:hover{border-color:rgba(201,168,76,.3);transform:translateY(-2px)}
-.stat-card .ic{font-size:1.2rem;color:rgba(201,168,76,.35);margin-bottom:8px}
-.stat-card .lbl{font-size:.68rem;color:var(--mu);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;font-weight:700}
-.stat-card .num{font-family:"Syne",sans-serif;font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--gl),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+/* STATS */
+.sr{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:24px}
+.sc{background:var(--s1);border:1px solid var(--br);border-radius:var(--r);padding:22px;transition:border-color .3s,transform .2s}
+.sc:hover{border-color:rgba(201,168,76,.3);transform:translateY(-2px)}
+.sc .ic{font-size:1.1rem;color:rgba(201,168,76,.35);margin-bottom:8px}
+.sc .lb{font-size:.68rem;color:var(--mu);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;font-weight:700}
+.sc .nm{font-family:"Syne",sans-serif;font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--gl),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
 
-/* ── PANEL ─────────────────────────────────────────────────── */
-.panel{background:var(--s1);border:1px solid var(--br);border-radius:var(--r);overflow:hidden;margin-bottom:20px}
-.panel-head{padding:16px 22px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between}
-.panel-head h3{font-size:.95rem;font-weight:700}
-.panel-body{padding:22px}
+/* PANEL */
+.pn{background:var(--s1);border:1px solid var(--br);border-radius:var(--r);overflow:hidden;margin-bottom:20px}
+.pnh{padding:16px 22px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between}
+.pnh h3{font-size:.95rem;font-weight:700}
+.pnb{padding:22px}
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 
-/* ── BUTTONS ───────────────────────────────────────────────── */
-.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:50px;font-weight:700;font-size:.8rem;cursor:pointer;border:none;font-family:"Space Grotesk",sans-serif;transition:transform .2s,box-shadow .2s;letter-spacing:.03em}
-.btn-gold{background:linear-gradient(135deg,var(--gl),var(--gold));color:#080808;box-shadow:0 4px 14px rgba(201,168,76,.25)}
-.btn-gold:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(201,168,76,.35)}
-.btn-outline{background:transparent;border:1px solid rgba(201,168,76,.35);color:var(--gold)}
-.btn-outline:hover{background:rgba(201,168,76,.08)}
-.btn-danger{background:transparent;border:1px solid rgba(232,87,87,.35);color:var(--red)}
-.btn-danger:hover{background:rgba(232,87,87,.08)}
-.btn-sm{padding:6px 14px;font-size:.74rem}
-.btn:disabled{opacity:.5;cursor:not-allowed;transform:none !important}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:50px;font-weight:700;font-size:.8rem;cursor:pointer;border:none;font-family:"Space Grotesk",sans-serif;transition:transform .2s,box-shadow .2s}
+.bg{background:linear-gradient(135deg,var(--gl),var(--gold));color:#080808;box-shadow:0 4px 14px rgba(201,168,76,.25)}.bg:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(201,168,76,.35)}
+.bo{background:transparent;border:1px solid rgba(201,168,76,.35);color:var(--gold)}.bo:hover{background:rgba(201,168,76,.08)}
+.bd{background:transparent;border:1px solid rgba(232,87,87,.35);color:var(--red)}.bd:hover{background:rgba(232,87,87,.08)}
+.bsm{padding:6px 14px;font-size:.74rem}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
 
-/* ── FORM ──────────────────────────────────────────────────── */
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.form-group{margin-bottom:16px}
-.form-group label{display:block;font-size:.7rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:2px;margin-bottom:7px}
-.form-group input,
-.form-group textarea,
-.form-group select{width:100%;padding:12px 15px;border:1px solid var(--br);border-radius:12px;background:var(--s2);color:var(--tx);font-family:"Space Grotesk",sans-serif;font-size:.9rem;outline:none;transition:border-color .3s}
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus{border-color:rgba(201,168,76,.5);box-shadow:0 0 0 3px rgba(201,168,76,.08)}
-.form-group input.error,
-.form-group textarea.error,
-.form-group select.error{border-color:var(--red) !important;box-shadow:0 0 0 3px rgba(232,87,87,.1) !important}
-.form-group textarea{resize:vertical;min-height:85px}
-.form-group select option{background:var(--s2)}
-.char-count{font-size:.7rem;color:var(--mu);text-align:right;margin-top:3px}
-.field-error{font-size:.72rem;color:var(--red);margin-top:4px;display:none}
+/* FORM */
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg{margin-bottom:16px}
+.fg label{display:block;font-size:.7rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:2px;margin-bottom:7px}
+.fg input,.fg textarea,.fg select{width:100%;padding:12px 15px;border:1px solid var(--br);border-radius:12px;background:var(--s2);color:var(--tx);font-family:"Space Grotesk",sans-serif;font-size:.9rem;outline:none;transition:border-color .3s}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:rgba(201,168,76,.5);box-shadow:0 0 0 3px rgba(201,168,76,.08)}
+.fg textarea{resize:vertical;min-height:85px}
+.fg select option{background:var(--s2)}
+.cc{font-size:.7rem;color:var(--mu);text-align:right;margin-top:3px}
 
-/* ── UPLOAD ─────────────────────────────────────────────────── */
-.upload-area{border:2px dashed rgba(201,168,76,.25);border-radius:14px;padding:28px 18px;text-align:center;cursor:pointer;transition:border-color .3s,background .3s;background:var(--s2);position:relative}
-.upload-area:hover,.upload-area.drag-over{border-color:var(--gold);background:rgba(201,168,76,.05)}
-.upload-area input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.upload-area i{font-size:1.8rem;color:rgba(201,168,76,.4);margin-bottom:8px;display:block}
-.upload-area p{color:var(--mu);font-size:.83rem}
-.upload-area span{color:var(--gold);font-weight:700}
-.preview-wrap{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-.preview-img{position:relative;width:85px;height:65px;border-radius:9px;overflow:hidden;border:1px solid var(--br)}
-.preview-img img{width:100%;height:100%;object-fit:cover}
-.remove-img{position:absolute;top:3px;right:3px;width:18px;height:18px;background:rgba(0,0,0,.75);border:none;border-radius:50%;cursor:pointer;color:#fff;font-size:.55rem;display:flex;align-items:center;justify-content:center}
+/* UPLOAD */
+.ua{border:2px dashed rgba(201,168,76,.25);border-radius:14px;padding:28px 18px;text-align:center;cursor:pointer;position:relative;transition:border-color .3s,background .3s;background:var(--s2)}
+.ua:hover,.ua.dv{border-color:var(--gold);background:rgba(201,168,76,.05)}
+.ua input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.ua i{font-size:1.8rem;color:rgba(201,168,76,.4);margin-bottom:8px;display:block}
+.ua p{color:var(--mu);font-size:.83rem}.ua span{color:var(--gold);font-weight:700}
+.pw{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.pi{position:relative;width:85px;height:65px;border-radius:9px;overflow:hidden;border:1px solid var(--br)}
+.pi img{width:100%;height:100%;object-fit:cover}
+.rmi{position:absolute;top:3px;right:3px;width:18px;height:18px;background:rgba(0,0,0,.75);border:none;border-radius:50%;cursor:pointer;color:#fff;font-size:.55rem;display:flex;align-items:center;justify-content:center}
 
-/* ── TABLE ──────────────────────────────────────────────────── */
-.data-table{width:100%;border-collapse:collapse}
-.data-table th{text-align:left;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--mu);padding:9px 14px;border-bottom:1px solid var(--br)}
-.data-table td{padding:12px 14px;border-bottom:1px solid rgba(201,168,76,.05);vertical-align:middle}
-.data-table tr:last-child td{border-bottom:none}
-.data-table tr:hover td{background:rgba(201,168,76,.02)}
-.thumb{width:52px;height:40px;border-radius:7px;object-fit:cover;border:1px solid var(--br)}
-.thumb-ph{width:52px;height:40px;border-radius:7px;background:var(--s2);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:.65rem}
-.tag-badge{display:inline-block;background:rgba(201,168,76,.1);color:var(--gold);font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:50px;text-transform:uppercase;letter-spacing:1px}
-.status-live{color:var(--grn);font-size:.76rem;font-weight:700;display:flex;align-items:center;gap:5px}
-.status-live::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--grn)}
-.status-draft{color:var(--mu);font-size:.76rem;font-weight:700;display:flex;align-items:center;gap:5px}
-.status-draft::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--mu)}
-.actions{display:flex;gap:7px;align-items:center}
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{text-align:left;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--mu);padding:9px 14px;border-bottom:1px solid var(--br)}
+.tbl td{padding:12px 14px;border-bottom:1px solid rgba(201,168,76,.05);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(201,168,76,.02)}
+.tthumb{width:52px;height:40px;border-radius:7px;object-fit:cover;border:1px solid var(--br)}
+.tph{width:52px;height:40px;border-radius:7px;background:var(--s2);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:.65rem}
+.tg{display:inline-block;background:rgba(201,168,76,.1);color:var(--gold);font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:50px;text-transform:uppercase;letter-spacing:1px}
+.sl{color:var(--grn);font-size:.76rem;font-weight:700;display:flex;align-items:center;gap:5px}
+.sl::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--grn)}
+.sd{color:var(--mu);font-size:.76rem;font-weight:700;display:flex;align-items:center;gap:5px}
+.sd::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--mu)}
+.ac{display:flex;gap:7px;align-items:center}
 
-/* ── MODAL ──────────────────────────────────────────────────── */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:flex;align-items:center;justify-content:center;padding:18px;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s;backdrop-filter:blur(4px)}
-.modal.open{opacity:1;visibility:visible}
-.modal-box{background:var(--s1);border:1px solid var(--br);border-radius:22px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;transform:translateY(18px);transition:transform .3s}
-.modal.open .modal-box{transform:translateY(0)}
-.modal-head{padding:22px 26px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--s1);z-index:1}
-.modal-head h3{font-size:1.1rem;font-weight:800}
-.modal-close{background:none;border:none;color:var(--mu);cursor:pointer;font-size:1.1rem;padding:3px;transition:color .2s}
-.modal-close:hover{color:var(--tx)}
-.modal-body{padding:26px}
-.modal-foot{padding:18px 26px;border-top:1px solid var(--br);display:flex;gap:10px;justify-content:flex-end}
+/* SETUP CARD */
+.setup-card{background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.04));border:1px solid rgba(201,168,76,.3);border-radius:18px;padding:28px;margin-bottom:20px}
+.setup-card h3{font-size:1.1rem;font-weight:800;margin-bottom:8px}
+.setup-card p{color:var(--mu);font-size:.86rem;line-height:1.65;margin-bottom:18px}
+.step{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--s2);border-radius:12px;margin-bottom:9px;border:1px solid var(--br)}
+.stn{width:26px;height:26px;border-radius:50%;background:rgba(201,168,76,.15);display:flex;align-items:center;justify-content:center;color:var(--gold);font-weight:800;font-size:.8rem;flex-shrink:0;margin-top:1px}
+.stt{font-size:.85rem;color:var(--mu);line-height:1.55}.stt strong{color:var(--tx)}
 
-/* ── TOAST ──────────────────────────────────────────────────── */
-.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9000;display:flex;flex-direction:column;gap:9px}
-.toast{background:var(--s1);border:1px solid var(--br);border-radius:13px;padding:13px 18px;display:flex;align-items:center;gap:11px;box-shadow:0 10px 36px rgba(0,0,0,.4);min-width:240px;animation:toastIn .3s ease;font-size:.86rem;font-weight:600}
-.toast.ok{border-color:rgba(37,211,102,.3)}.toast.ok .ti{color:var(--grn)}
-.toast.er{border-color:rgba(232,87,87,.3)}.toast.er .ti{color:var(--red)}
-.toast.info{border-color:rgba(201,168,76,.3)}.toast.info .ti{color:var(--gold)}
-@keyframes toastIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:translateX(0)}}
+/* TOKEN INPUT */
+.token-row{display:flex;gap:10px;margin-top:18px}
+.token-row input{flex:1;padding:12px 15px;border:1px solid var(--br);border-radius:12px;background:var(--s2);color:var(--tx);font-family:"Space Grotesk",sans-serif;font-size:.9rem;outline:none;transition:border-color .3s}
+.token-row input:focus{border-color:rgba(201,168,76,.5)}
+.token-status{margin-top:10px;font-size:.8rem;display:none}
+.token-status.ok{color:var(--grn);display:flex;align-items:center;gap:6px}
+.token-status.er{color:var(--red);display:flex;align-items:center;gap:6px}
 
-/* ── STATES ─────────────────────────────────────────────────── */
-.empty-state{text-align:center;padding:36px 18px;color:var(--mu)}
-.empty-state i{font-size:2rem;margin-bottom:10px;display:block;opacity:.25}
-.loading-state{text-align:center;padding:28px;color:var(--mu);font-size:.9rem}
-.loading-state i{color:var(--gold);margin-right:7px;animation:spin 1s linear infinite}
+/* MODAL */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:flex;align-items:center;justify-content:center;padding:18px;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s;backdrop-filter:blur(4px)}
+.mo.open{opacity:1;visibility:visible}
+.mb{background:var(--s1);border:1px solid var(--br);border-radius:22px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;transform:translateY(18px);transition:transform .3s}
+.mo.open .mb{transform:translateY(0)}
+.mh{padding:22px 26px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--s1);z-index:1}
+.mh h3{font-size:1.1rem;font-weight:800}
+.mc{background:none;border:none;color:var(--mu);cursor:pointer;font-size:1.1rem;transition:color .2s}.mc:hover{color:var(--tx)}
+.mbd{padding:26px}
+.mf{padding:18px 26px;border-top:1px solid var(--br);display:flex;gap:10px;justify-content:flex-end}
+
+/* TOAST */
+.tw{position:fixed;bottom:24px;right:24px;z-index:9000;display:flex;flex-direction:column;gap:9px}
+.ts{background:var(--s1);border:1px solid var(--br);border-radius:13px;padding:13px 18px;display:flex;align-items:center;gap:11px;box-shadow:0 10px 36px rgba(0,0,0,.4);min-width:240px;animation:tin .3s ease;font-size:.86rem;font-weight:600}
+.ts.ok{border-color:rgba(37,211,102,.3)}.ts.ok .ti{color:var(--grn)}
+.ts.er{border-color:rgba(232,87,87,.3)}.ts.er .ti{color:var(--red)}
+.ts.in{border-color:rgba(201,168,76,.3)}.ts.in .ti{color:var(--gold)}
+@keyframes tin{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:translateX(0)}}
+
+.em{text-align:center;padding:36px 18px;color:var(--mu)}.em i{font-size:2rem;margin-bottom:10px;display:block;opacity:.25}
+.lo{text-align:center;padding:28px;color:var(--mu);font-size:.9rem}.lo i{color:var(--gold);margin-right:7px;display:inline-block;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-
-/* ── FILTER BAR ─────────────────────────────────────────────── */
-.filter-bar{display:flex;gap:9px;margin-bottom:18px;flex-wrap:wrap}
-
-@media(max-width:768px){
-  .sb{transform:translateX(-100%)}
-  .main-wrap{margin-left:0}
-  .form-grid{grid-template-columns:1fr}
-  .content{padding:18px}
-  .dash-grid{grid-template-columns:1fr}
-}
+@media(max-width:768px){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.fr{grid-template-columns:1fr}.ct{padding:18px}.dg{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<!-- ── LOGIN OVERLAY ────────────────────────────────────────── -->
-<div id="login">
-  <div class="lb-box">
-    <div class="lb-title">S.Saadi</div>
-    <div class="lb-sub">Portfolio Admin Panel</div>
-    <div class="lf">
-      <label>Username</label>
-      <input type="text" id="lu" placeholder="admin" autocomplete="username">
-    </div>
-    <div class="lf">
-      <label>Password</label>
-      <input type="password" id="lp" placeholder="••••••••" autocomplete="current-password">
-    </div>
-    <button class="lbtn" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Login</button>
-    <div class="lerr" id="lerr">Wrong username or password</div>
-    <div class="db-status">
-      <div class="db-dot" id="dbd"></div>
-      <span id="dbt">Connecting to Firebase…</span>
-    </div>
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="lbox">
+    <div class="llogo">S.Saadi</div>
+    <div class="lsub">Sign in with your Firebase account</div>
+    <div class="lf"><label>Email</label><input type="email" id="lemail" placeholder="admin@saadi.com" autocomplete="email"></div>
+    <div class="lf"><label>Password</label><input type="password" id="lpass" placeholder="••••••••" autocomplete="current-password"></div>
+    <button class="lbtn" id="lbtn" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Sign In with Firebase</button>
+    <div class="lerr" id="lerr"></div>
+    <div class="lbadge"><div class="ldot"></div><span>Firebase Authentication</span></div>
   </div>
 </div>
 
-<!-- ── SIDEBAR ───────────────────────────────────────────────── -->
-<aside class="sb">
-  <div class="sb-brand">
-    <div class="b">S<span>.</span>Saadi</div>
-    <div class="s">Admin Dashboard</div>
-  </div>
-  <nav class="sb-nav">
-    <div class="sb-group">Main</div>
-    <div class="nav-item on" onclick="gotoPage('dash',this)"><i class="fas fa-th-large"></i> Dashboard</div>
-    <div class="nav-item" onclick="gotoPage('projects',this)"><i class="fas fa-folder-open"></i> All Projects</div>
-    <div class="nav-item" onclick="gotoPage('add',this)"><i class="fas fa-plus-circle"></i> Add Project</div>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sbrand"><div class="nm">S<span>.</span>Saadi</div><div class="sub">Admin Dashboard</div></div>
+  <nav class="snav">
+    <div class="sg">Main</div>
+    <div class="ni on" onclick="gp('dash',this)"><i class="fas fa-th-large"></i> Dashboard</div>
+    <div class="ni" onclick="gp('projects',this)"><i class="fas fa-folder-open"></i> All Projects</div>
+    <div class="ni" onclick="gp('add',this)"><i class="fas fa-plus-circle"></i> Add Project</div>
+    <div class="sg" style="margin-top:8px">Config</div>
+    <div class="ni" onclick="gp('settings',this)"><i class="fas fa-key"></i> GitHub Token</div>
   </nav>
-  <div class="sb-foot">
-    <button class="logout-btn" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-  </div>
+  <div class="sfoot"><button class="lob" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button></div>
 </aside>
 
-<!-- ── MAIN ──────────────────────────────────────────────────── -->
-<div class="main-wrap">
+<!-- MAIN -->
+<div class="main">
   <div class="topbar">
-    <span class="topbar-title" id="topbarTitle">Dashboard</span>
-    <div class="topbar-right">
-      <div class="fb-badge"><div class="db-dot" id="tbDot"></div><span id="tbText">Firebase</span></div>
-      <a href="index.html" target="_blank" class="view-btn"><i class="fas fa-external-link-alt"></i> View Portfolio</a>
+    <span class="ttitle" id="ttitle">Dashboard</span>
+    <div class="tbr">
+      <div class="gh-badge"><div class="dot" id="ghDot"></div><span id="ghText">GitHub</span></div>
+      <a href="index.html" target="_blank" class="vbtn"><i class="fas fa-external-link-alt"></i> View Portfolio</a>
     </div>
   </div>
+  <div class="ct">
 
-  <div class="content">
-
-    <!-- DASHBOARD PAGE -->
-    <div class="page on" id="pg-dash">
-      <div class="page-header"><h2>Welcome back, Saadi 👋</h2><p>Your portfolio overview</p></div>
-      <div class="stats-row">
-        <div class="stat-card"><div class="ic"><i class="fas fa-folder"></i></div><div class="lbl">Total</div><div class="num" id="stTotal">—</div></div>
-        <div class="stat-card"><div class="ic"><i class="fas fa-eye"></i></div><div class="lbl">Live</div><div class="num" id="stLive">—</div></div>
-        <div class="stat-card"><div class="ic"><i class="fas fa-drafting-compass"></i></div><div class="lbl">Drafts</div><div class="num" id="stDraft">—</div></div>
+    <!-- DASHBOARD -->
+    <div class="pg on" id="pg-dash">
+      <div class="ph"><h2>Welcome back, Saadi 👋</h2><p>Projects are saved directly to your GitHub repository</p></div>
+      <div class="sr">
+        <div class="sc"><div class="ic"><i class="fas fa-folder"></i></div><div class="lb">Total</div><div class="nm" id="stT">—</div></div>
+        <div class="sc"><div class="ic"><i class="fas fa-eye"></i></div><div class="lb">Live</div><div class="nm" id="stL">—</div></div>
+        <div class="sc"><div class="ic"><i class="fas fa-drafting-compass"></i></div><div class="lb">Drafts</div><div class="nm" id="stD">—</div></div>
       </div>
-      <div class="dash-grid">
-        <div class="panel">
-          <div class="panel-head"><h3><i class="fas fa-clock" style="color:var(--gold);margin-right:7px"></i>Recent Projects</h3><button class="btn btn-outline btn-sm" onclick="gotoPage('add',null)"><i class="fas fa-plus"></i> Add</button></div>
-          <div class="panel-body" id="recentProjs"><div class="loading-state"><i class="fas fa-spinner"></i>Loading…</div></div>
+      <div class="dg">
+        <div class="pn">
+          <div class="pnh"><h3><i class="fas fa-clock" style="color:var(--gold);margin-right:7px"></i>Recent Projects</h3><button class="btn bo bsm" onclick="gp('add',null)"><i class="fas fa-plus"></i> Add</button></div>
+          <div class="pnb" id="recentPanel"><div class="lo"><i class="fas fa-spinner"></i>Loading...</div></div>
         </div>
-        <div class="panel">
-          <div class="panel-head"><h3><i class="fas fa-fire" style="color:#f59e0b;margin-right:7px"></i>Firebase Status</h3></div>
-          <div class="panel-body" id="fbStatusEl"><div class="loading-state"><i class="fas fa-spinner"></i>Checking…</div></div>
+        <div class="pn">
+          <div class="pnh"><h3><i class="fab fa-github" style="margin-right:7px"></i>GitHub Status</h3></div>
+          <div class="pnb" id="ghStatusPanel"><div class="lo"><i class="fas fa-spinner"></i>Checking...</div></div>
         </div>
       </div>
     </div>
 
-    <!-- ALL PROJECTS PAGE -->
-    <div class="page" id="pg-projects">
-      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
-        <div><h2>All Projects</h2><p>Manage your portfolio projects</p></div>
-        <button class="btn btn-gold" onclick="gotoPage('add',null)"><i class="fas fa-plus"></i> Add New</button>
+    <!-- ALL PROJECTS -->
+    <div class="pg" id="pg-projects">
+      <div class="ph" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div><h2>All Projects</h2><p>Loaded from <code style="background:var(--s2);padding:2px 8px;border-radius:6px;font-size:.8rem">sheikh-saadi-dev/portfolio/projects.json</code></p></div>
+        <button class="btn bg" onclick="gp('add',null)"><i class="fas fa-plus"></i> Add New</button>
       </div>
-      <div class="filter-bar">
-        <button class="btn btn-gold btn-sm" onclick="applyFilter('all',this)" id="fAll">All</button>
-        <button class="btn btn-outline btn-sm" onclick="applyFilter('live',this)">Live</button>
-        <button class="btn btn-outline btn-sm" onclick="applyFilter('draft',this)">Draft</button>
+      <div style="display:flex;gap:9px;margin-bottom:18px;flex-wrap:wrap">
+        <button class="btn bg bsm" onclick="filt('all',this)">All</button>
+        <button class="btn bo bsm" onclick="filt('live',this)">Live</button>
+        <button class="btn bo bsm" onclick="filt('draft',this)">Draft</button>
       </div>
-      <div class="panel"><div class="panel-body" style="padding:0;overflow-x:auto"><div id="projectTable"></div></div></div>
+      <div class="pn"><div class="pnb" style="padding:0;overflow-x:auto"><div id="tblWrap"><div class="lo"><i class="fas fa-spinner"></i>Loading...</div></div></div></div>
     </div>
 
-    <!-- ADD PROJECT PAGE -->
-    <div class="page" id="pg-add">
-      <div class="page-header"><h2 id="formHeading">Add New Project</h2><p>Fill in details and save to Firestore</p></div>
-      <div class="panel"><div class="panel-body">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Title <span style="color:var(--red)">*</span></label>
-            <input type="text" id="fTitle" placeholder="e.g. Spice Garden Restaurant" maxlength="60" oninput="updateCharCount(this,'cTitle',60)">
-            <div class="char-count"><span id="cTitle">0</span>/60</div>
-            <div class="field-error" id="errTitle">Title is required</div>
-          </div>
-          <div class="form-group">
-            <label>Category <span style="color:var(--red)">*</span></label>
-            <select id="fCategory">
-              <option value="">Select category…</option>
-              <option>Restaurant</option><option>Beauty Salon</option><option>Fitness</option>
-              <option>Real Estate</option><option>Education</option><option>E-commerce</option>
-              <option>Business</option><option>Healthcare</option><option>Other</option>
-            </select>
-            <div class="field-error" id="errCategory">Please select a category</div>
-          </div>
+    <!-- ADD PROJECT -->
+    <div class="pg" id="pg-add">
+      <div class="ph"><h2 id="addTitle">Add New Project</h2><p>Will be saved to <strong>projects.json</strong> in your GitHub repo</p></div>
+      <div class="pn"><div class="pnb">
+        <input type="hidden" id="editId">
+        <div class="fr">
+          <div class="fg"><label>Title *</label><input type="text" id="fTitle" placeholder="e.g. Spice Garden Restaurant" maxlength="60" oninput="cc(this,'cTitle',60)"><div class="cc"><span id="cTitle">0</span>/60</div></div>
+          <div class="fg"><label>Category *</label><select id="fCat"><option value="">Select...</option><option>Restaurant</option><option>Beauty Salon</option><option>Fitness</option><option>Real Estate</option><option>Education</option><option>E-commerce</option><option>Business</option><option>Healthcare</option><option>Other</option></select></div>
         </div>
-        <div class="form-group">
-          <label>Description <span style="color:var(--red)">*</span></label>
-          <textarea id="fDesc" placeholder="Describe the project…" maxlength="220" oninput="updateCharCount(this,'cDesc',220)"></textarea>
-          <div class="char-count"><span id="cDesc">0</span>/220</div>
-          <div class="field-error" id="errDesc">Description is required</div>
+        <div class="fg"><label>Description *</label><textarea id="fDesc" placeholder="Describe the project..." maxlength="220" oninput="cc(this,'cDesc',220)"></textarea><div class="cc"><span id="cDesc">0</span>/220</div></div>
+        <div class="fr">
+          <div class="fg"><label>Demo URL</label><input type="url" id="fUrl" placeholder="https://example.com"></div>
+          <div class="fg"><label>Status</label><select id="fStatus"><option value="live">Live — Visible on portfolio</option><option value="draft">Draft — Hidden</option></select></div>
         </div>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Live Demo URL</label>
-            <input type="url" id="fUrl" placeholder="https://example.com">
-          </div>
-          <div class="form-group">
-            <label>Status</label>
-            <select id="fStatus"><option value="live">Live</option><option value="draft">Draft</option></select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Screenshot (Max 1MB)</label>
-          <div class="upload-area" id="uploadArea"
-            ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
-            <input type="file" id="fileInput" accept="image/*" onchange="onFileSelect(event)">
+        <div class="fg">
+          <label>Screenshot <span style="color:var(--mu);font-weight:400;text-transform:none;letter-spacing:0">(max 300KB)</span></label>
+          <div class="ua" id="upa" ondragover="dov(event)" ondragleave="dlv()" ondrop="ddp(event)">
+            <input type="file" id="fImg" accept="image/*" onchange="imgSel(event)">
             <i class="fas fa-cloud-upload-alt"></i>
             <p>Drag & drop or <span>click to upload</span></p>
-            <p style="font-size:.73rem;margin-top:3px;opacity:.55">PNG, JPG, WEBP — Max 1MB</p>
+            <p style="font-size:.73rem;margin-top:3px;opacity:.55">PNG, JPG, WEBP — Max 300KB</p>
           </div>
-          <div class="preview-wrap" id="previewWrap"></div>
+          <div class="pw" id="prevWrap"></div>
         </div>
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px">
-          <button class="btn btn-outline" onclick="cancelForm()">Cancel</button>
-          <button class="btn btn-gold" id="saveBtn" onclick="saveProject()">
-            <i class="fas fa-save"></i> Save to Firebase
-          </button>
+          <button class="btn bo" onclick="cancelForm()">Cancel</button>
+          <button class="btn bg" id="saveBtn" onclick="saveProject()"><i class="fas fa-save"></i> Save to GitHub</button>
         </div>
       </div></div>
     </div>
 
-  </div><!-- /content -->
-</div><!-- /main-wrap -->
-
-<!-- ── EDIT MODAL ─────────────────────────────────────────────── -->
-<div class="modal" id="editModal">
-  <div class="modal-box">
-    <div class="modal-head">
-      <h3>Edit Project</h3>
-      <button class="modal-close" onclick="closeEdit()"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group"><label>Title *</label><input type="text" id="eTitle" maxlength="60"></div>
-        <div class="form-group">
-          <label>Category *</label>
-          <select id="eCategory">
-            <option value="">Select…</option>
-            <option>Restaurant</option><option>Beauty Salon</option><option>Fitness</option>
-            <option>Real Estate</option><option>Education</option><option>E-commerce</option>
-            <option>Business</option><option>Healthcare</option><option>Other</option>
-          </select>
+    <!-- GITHUB TOKEN SETTINGS -->
+    <div class="pg" id="pg-settings">
+      <div class="ph"><h2>GitHub Token Setup</h2><p>Required to save projects to your repository</p></div>
+      <div class="setup-card">
+        <h3><i class="fab fa-github" style="margin-right:8px"></i>How to get your GitHub Token</h3>
+        <p>একটা Personal Access Token (classic) দরকার যেটা দিয়ে Admin Panel তোমার repo তে <code>projects.json</code> লিখতে পারবে।</p>
+        <div class="step"><div class="stn">1</div><div class="stt">GitHub.com → Profile → <strong>Settings</strong></div></div>
+        <div class="step"><div class="stn">2</div><div class="stt">Left sidebar → <strong>Developer settings</strong> (একদম নিচে)</div></div>
+        <div class="step"><div class="stn">3</div><div class="stt"><strong>Personal access tokens</strong> → <strong>Tokens (classic)</strong></div></div>
+        <div class="step"><div class="stn">4</div><div class="stt"><strong>Generate new token (classic)</strong> → Note: "Portfolio Admin" → Scope: <strong>repo</strong> ✓ → Generate</div></div>
+        <div class="step"><div class="stn">5</div><div class="stt">Token copy করো (একবারই দেখাবে!) → নিচে paste করো</div></div>
+        <div class="token-row">
+          <input type="password" id="ghTokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+          <button class="btn bg" onclick="saveToken()"><i class="fas fa-save"></i> Save Token</button>
+          <button class="btn bo bsm" onclick="testToken()"><i class="fas fa-plug"></i> Test</button>
+        </div>
+        <div class="token-status" id="tokenStatus"></div>
+      </div>
+      <div class="pn" style="margin-top:6px">
+        <div class="pnh"><h3>Repo Info</h3></div>
+        <div class="pnb" style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--br)">
+            <span style="color:var(--mu);font-size:.85rem">Owner</span>
+            <code style="background:var(--s2);padding:4px 12px;border-radius:8px;font-size:.85rem">sheikh-saadi-dev</code>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--br)">
+            <span style="color:var(--mu);font-size:.85rem">Repository</span>
+            <code style="background:var(--s2);padding:4px 12px;border-radius:8px;font-size:.85rem">portfolio</code>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0">
+            <span style="color:var(--mu);font-size:.85rem">Data file</span>
+            <code style="background:var(--s2);padding:4px 12px;border-radius:8px;font-size:.85rem">projects.json</code>
+          </div>
         </div>
       </div>
-      <div class="form-group"><label>Description *</label><textarea id="eDesc" maxlength="220"></textarea></div>
-      <div class="form-grid">
-        <div class="form-group"><label>Live Demo URL</label><input type="url" id="eUrl"></div>
-        <div class="form-group"><label>Status</label><select id="eStatus"><option value="live">Live</option><option value="draft">Draft</option></select></div>
-      </div>
-      <div class="form-group">
-        <label>Replace Screenshot (optional)</label>
-        <input type="file" id="eFile" accept="image/*" onchange="onEditFileSelect(event)" style="background:var(--s2);padding:10px;border-radius:10px;border:1px solid var(--br);width:100%">
-        <div id="eImgPreview" style="margin-top:8px"></div>
-      </div>
     </div>
-    <div class="modal-foot">
-      <button class="btn btn-outline" onclick="closeEdit()">Cancel</button>
-      <button class="btn btn-gold" id="updateBtn" onclick="updateProject()"><i class="fas fa-save"></i> Save</button>
-    </div>
+
   </div>
 </div>
 
-<!-- ── DELETE MODAL ───────────────────────────────────────────── -->
-<div class="modal" id="deleteModal">
-  <div class="modal-box" style="max-width:420px">
-    <div class="modal-head">
-      <h3>Delete Project</h3>
-      <button class="modal-close" onclick="closeDelete()"><i class="fas fa-times"></i></button>
+<!-- EDIT MODAL -->
+<div class="mo" id="emod">
+  <div class="mb">
+    <div class="mh"><h3>Edit Project</h3><button class="mc" onclick="closeEdit()"><i class="fas fa-times"></i></button></div>
+    <div class="mbd">
+      <div class="fr">
+        <div class="fg"><label>Title *</label><input type="text" id="eTitle" maxlength="60"></div>
+        <div class="fg"><label>Category</label><select id="eCat"><option>Restaurant</option><option>Beauty Salon</option><option>Fitness</option><option>Real Estate</option><option>Education</option><option>E-commerce</option><option>Business</option><option>Healthcare</option><option>Other</option></select></div>
+      </div>
+      <div class="fg"><label>Description *</label><textarea id="eDesc" maxlength="220" style="min-height:75px"></textarea></div>
+      <div class="fr">
+        <div class="fg"><label>Demo URL</label><input type="url" id="eUrl"></div>
+        <div class="fg"><label>Status</label><select id="eStatus"><option value="live">Live</option><option value="draft">Draft</option></select></div>
+      </div>
+      <div class="fg">
+        <label>Replace Screenshot</label>
+        <div class="ua" style="padding:16px"><input type="file" id="eImg" accept="image/*" onchange="eImgSel(event)"><i class="fas fa-image"></i><p style="font-size:.82rem">Click to replace</p></div>
+        <div id="eImgPrev" style="margin-top:10px"></div>
+      </div>
     </div>
-    <div class="modal-body">
-      <p style="color:var(--mu);line-height:1.6">Are you sure you want to delete <strong id="deleteTitle" style="color:var(--tx)"></strong>? This action cannot be undone.</p>
-    </div>
-    <div class="modal-foot">
-      <button class="btn btn-outline" onclick="closeDelete()">Cancel</button>
-      <button class="btn btn-danger" onclick="confirmDelete()"><i class="fas fa-trash"></i> Delete</button>
-    </div>
+    <div class="mf"><button class="btn bo" onclick="closeEdit()">Cancel</button><button class="btn bg" id="updBtn" onclick="updateProject()"><i class="fas fa-save"></i> Save to GitHub</button></div>
   </div>
 </div>
 
-<!-- ── TOAST CONTAINER ───────────────────────────────────────── -->
-<div class="toast-wrap" id="toastWrap"></div>
+<!-- DELETE MODAL -->
+<div class="mo" id="dmod">
+  <div class="mb" style="max-width:380px">
+    <div class="mh"><h3>Delete Project</h3><button class="mc" onclick="closeDelete()"><i class="fas fa-times"></i></button></div>
+    <div class="mbd" style="text-align:center;padding:32px 24px">
+      <i class="fas fa-trash-alt" style="font-size:2.3rem;color:var(--red);margin-bottom:14px;display:block"></i>
+      <h3 style="margin-bottom:8px">Are you sure?</h3>
+      <p style="color:var(--mu);font-size:.87rem">Delete "<span id="dname" style="color:var(--tx);font-weight:700"></span>"?<br><span style="font-size:.8rem;opacity:.7">This will update projects.json on GitHub.</span></p>
+    </div>
+    <div class="mf"><button class="btn bo" onclick="closeDelete()">Cancel</button><button class="btn bd" onclick="confirmDelete()"><i class="fas fa-trash"></i> Delete</button></div>
+  </div>
+</div>
 
-<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     FIREBASE MODULE SCRIPT
-     Responsibilities: WRITE-ONLY (addDoc, updateDoc, deleteDoc)
-     Index page handles all reads for the public portfolio.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="tw" id="twrap"></div>
+
+<!-- FIREBASE AUTH + GITHUB API SCRIPT -->
 <script type="module">
+import { initializeApp }          from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
-// ── 1. FIREBASE INITIALIZATION ───────────────────────────────
-import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import {
-  getFirestore,
-  collection,
-  addDoc,          // CREATE — admin only
-  getDocs,         // READ   — used only inside admin, not exposed to public
-  updateDoc,       // UPDATE — admin only
-  deleteDoc,       // DELETE — admin only
-  doc,
-  orderBy,
-  query,
-  serverTimestamp  // ← always use server-side timestamp for accuracy
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-// ── Firebase config (same project, same DB — admin writes, index reads)
+// ── FIREBASE AUTH INIT ────────────────────────────────────────
 const firebaseConfig = {
-  apiKey:            "AIzaSyC0fetGvPZs_mjbK3zIxB_NaiouuADfQtQ",
-  authDomain:        "educentral-yz88l.firebaseapp.com",
-  projectId:         "educentral-yz88l",
-  storageBucket:     "educentral-yz88l.firebasestorage.app",
-  messagingSenderId: "614628314650",
-  appId:             "1:614628314650:web:cef50e2142ce11f1e50ba3"
+  "apiKey": "AIzaSyC0fetGvPZs_mjbK3zIxB_NaiouuADfQtQ",
+  "authDomain": "educentral-yz88l.firebaseapp.com",
+  "projectId": "educentral-yz88l",
+  "storageBucket": "educentral-yz88l.firebasestorage.app",
+  "messagingSenderId": "614628314650",
+  "appId": "1:614628314650:web:cef50e2142ce11f1e50ba3"
 };
+const app  = initializeApp(firebaseConfig, 'admin');
+const auth = getAuth(app);
 
-console.log('[Admin] Initializing Firebase app…');
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
-console.log('[Admin] Firestore instance ready.');
+console.log('[Admin] Firebase Auth initialized');
 
-// ── 2. STATE ─────────────────────────────────────────────────
-let allProjects  = [];
-let activeFilter = 'all';
+// ── GITHUB CONFIG ─────────────────────────────────────────────
+const GH_OWNER  = 'sheikh-saadi-dev';
+const GH_REPO   = 'portfolio';
+const GH_FILE   = 'projects.json';
+const GH_BRANCH = 'main';
+const GH_API    = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
+
+// ── STATE ─────────────────────────────────────────────────────
+let projects     = [];   // in-memory project list
+let currentSHA   = null; // GitHub file SHA (required for updates)
+let curFilter    = 'all';
 let editingId    = null;
-let deleteId     = null;
-let uploadedImage      = null; // base64 for new project
-let editUploadedImage  = null; // base64 for edit modal
+let deletingId   = null;
+let curImg       = null;
+let editImg      = null;
 
-// Simple local-only auth (replace with Firebase Auth for production)
-const ADMIN_USER = 'admin';
-const ADMIN_PASS = 'saadi1234';
+// ── GITHUB TOKEN (stored in localStorage only) ────────────────
+const getToken = () => localStorage.getItem('ss_gh_token') || '';
 
-// ── 3. FIREBASE CONNECTION CHECK ─────────────────────────────
-async function checkFirebaseConnection() {
-  console.log('[Admin] Checking Firestore connection…');
-  try {
-    await getDocs(collection(db, 'projects'));
-    console.log('[Admin] ✅ Firestore connected successfully.');
-    setConnectionUI(true);
-  } catch (err) {
-    console.error('[Admin] ❌ Firestore connection failed:', err);
-    setConnectionUI(false);
-  }
-}
-
-function setConnectionUI(connected) {
-  const loginDot  = document.getElementById('dbd');
-  const loginText = document.getElementById('dbt');
-  const topDot    = document.getElementById('tbDot');
-  const topText   = document.getElementById('tbText');
-  const statusEl  = document.getElementById('fbStatusEl');
-
-  if (connected) {
-    loginDot.className  = 'db-dot ok';
-    loginText.textContent = 'Firebase Connected ✓';
-    topDot.className    = 'db-dot ok';
-    topText.textContent = 'Firebase Live';
-    statusEl.innerHTML  = `
-      <div style="display:flex;align-items:center;gap:12px;padding:14px;background:rgba(37,211,102,.07);border:1px solid rgba(37,211,102,.2);border-radius:12px">
-        <i class="fas fa-check-circle" style="color:var(--grn);font-size:1.3rem"></i>
-        <div>
-          <div style="font-weight:700;color:var(--grn)">Connected!</div>
-          <div style="font-size:.82rem;color:var(--mu);margin-top:2px">Projects you save here appear live on the portfolio index page.</div>
-        </div>
-      </div>`;
+// ── FIREBASE AUTH STATE ───────────────────────────────────────
+onAuthStateChanged(auth, user => {
+  if (user) {
+    console.log('[Admin] Signed in as:', user.email);
+    document.getElementById('loginScreen').classList.add('hidden');
+    toast('Welcome back, Saadi! 👋', 'ok');
+    loadFromGitHub();
   } else {
-    loginDot.className  = 'db-dot err';
-    loginText.textContent = 'Firebase Error — Check Console';
-    topDot.className    = 'db-dot err';
-    topText.textContent = 'Firebase Error';
-    statusEl.innerHTML  = `
-      <div style="display:flex;align-items:center;gap:12px;padding:14px;background:rgba(232,87,87,.07);border:1px solid rgba(232,87,87,.2);border-radius:12px">
-        <i class="fas fa-times-circle" style="color:var(--red);font-size:1.3rem"></i>
-        <div>
-          <div style="font-weight:700;color:var(--red)">Connection Error</div>
-          <div style="font-size:.82rem;color:var(--mu);margin-top:2px">Check Firestore rules — allow read/write in test mode.</div>
-        </div>
-      </div>`;
+    console.log('[Admin] Not signed in');
+    document.getElementById('loginScreen').classList.remove('hidden');
   }
-}
-
-checkFirebaseConnection();
-
-// ── 4. AUTH ──────────────────────────────────────────────────
-window.doLogin = function() {
-  const username = document.getElementById('lu').value.trim();
-  const password = document.getElementById('lp').value;
-  console.log('[Admin] Login attempt for user:', username);
-
-  if (username === ADMIN_USER && password === ADMIN_PASS) {
-    console.log('[Admin] ✅ Login successful.');
-    document.getElementById('login').classList.add('hide');
-    showToast('Welcome back, Saadi! 👋', 'ok');
-    loadDashboard();
-  } else {
-    console.warn('[Admin] ❌ Login failed — wrong credentials.');
-    document.getElementById('lerr').style.display = 'block';
-    const pwInput = document.getElementById('lp');
-    pwInput.style.borderColor = 'var(--red)';
-    setTimeout(() => { pwInput.style.borderColor = ''; }, 2000);
-  }
-};
-
-window.doLogout = function() {
-  console.log('[Admin] Logging out.');
-  document.getElementById('login').classList.remove('hide');
-  document.getElementById('lu').value = '';
-  document.getElementById('lp').value = '';
-};
-
-document.getElementById('lp').addEventListener('keydown', e => {
-  if (e.key === 'Enter') window.doLogin();
 });
 
-// ── 5. NAVIGATION ────────────────────────────────────────────
-window.gotoPage = function(pageId, navEl) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('on'));
-  document.getElementById('pg-' + pageId).classList.add('on');
-  if (navEl) navEl.classList.add('on');
+// ── LOGIN ─────────────────────────────────────────────────────
+window.doLogin = async function() {
+  const email = document.getElementById('lemail').value.trim();
+  const pass  = document.getElementById('lpass').value;
+  const btn   = document.getElementById('lbtn');
+  const err   = document.getElementById('lerr');
 
-  const titles = { dash: 'Dashboard', projects: 'All Projects', add: 'Add Project' };
-  document.getElementById('topbarTitle').textContent = titles[pageId] || pageId;
+  if (!email || !pass) { err.textContent = 'Email and password required'; err.style.display = 'block'; return; }
 
-  if (pageId === 'projects') loadProjectsTable();
-  if (pageId === 'dash')     loadDashboard();
-  if (pageId === 'add')      resetAddForm();
+  btn.disabled  = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+  err.style.display = 'none';
+
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    console.log('[Admin] Login success');
+  } catch (e) {
+    console.error('[Admin] Login error:', e.code);
+    const msgs = {
+      'auth/user-not-found':    'No account found with this email.',
+      'auth/wrong-password':    'Wrong password.',
+      'auth/invalid-email':     'Invalid email address.',
+      'auth/invalid-credential':'Wrong email or password.',
+      'auth/too-many-requests': 'Too many attempts. Try again later.',
+    };
+    err.textContent   = msgs[e.code] || `Error: ${e.code}`;
+    err.style.display = 'block';
+  }
+  btn.disabled  = false;
+  btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In with Firebase';
+};
+document.getElementById('lpass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+window.doLogout = async () => { await signOut(auth); };
+
+// ── NAV ───────────────────────────────────────────────────────
+window.gp = function(id, el) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
+  document.getElementById('pg-' + id).classList.add('on');
+  if (el) el.classList.add('on');
+  const T = { dash:'Dashboard', projects:'All Projects', add:'Add Project', settings:'GitHub Token' };
+  document.getElementById('ttitle').textContent = T[id] || id;
+  if (id === 'projects') renderTable();
+  if (id === 'dash')     loadFromGitHub();
+  if (id === 'add')      resetForm();
+  if (id === 'settings') loadSettings();
 };
 
-// ── 6. READ (admin-internal only) ───────────────────────────
-// Note: This read is only used inside the admin panel for listing & editing.
-// The public index.html has its own independent read logic.
-async function fetchAllProjects() {
-  console.log('[Admin] Fetching all projects from Firestore…');
-  try {
-    const q    = query(collection(db, 'projects'), orderBy('createdAt', 'desc'));
-    const snap = await getDocs(q);
-    allProjects = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    console.log(`[Admin] ✅ Fetched ${allProjects.length} projects.`);
-    return allProjects;
-  } catch (err) {
-    console.error('[Admin] ❌ Failed to fetch projects:', err);
-    showToast('Failed to load projects: ' + err.message, 'er');
-    return [];
-  }
-}
+// ── GITHUB: READ projects.json ────────────────────────────────
+async function loadFromGitHub() {
+  console.log('[Admin] Fetching projects.json from GitHub...');
+  setGHBadge('loading');
 
-// ── 7. DASHBOARD ─────────────────────────────────────────────
-async function loadDashboard() {
-  document.getElementById('stTotal').textContent = '…';
-  document.getElementById('stLive').textContent  = '…';
-  document.getElementById('stDraft').textContent = '…';
-  document.getElementById('recentProjs').innerHTML = '<div class="loading-state"><i class="fas fa-spinner"></i>Loading…</div>';
-
-  const projects = await fetchAllProjects();
-
-  document.getElementById('stTotal').textContent = projects.length;
-  document.getElementById('stLive').textContent  = projects.filter(p => p.status === 'live').length;
-  document.getElementById('stDraft').textContent = projects.filter(p => p.status === 'draft').length;
-
-  const recentEl  = document.getElementById('recentProjs');
-  const recent    = projects.slice(0, 4);
-
-  if (!recent.length) {
-    recentEl.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><p>No projects yet</p></div>';
+  const token = getToken();
+  if (!token) {
+    console.warn('[Admin] No GitHub token set');
+    setGHBadge('error', 'No token');
+    showGHStatus(false, 'GitHub token is missing. Go to <strong>GitHub Token</strong> settings.');
+    updateStats([]); showRecent([]);
     return;
   }
 
-  recentEl.innerHTML = recent.map(p => `
-    <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(201,168,76,.05)">
-      ${p.image
-        ? `<img src="${p.image}" style="width:48px;height:37px;border-radius:7px;object-fit:cover;border:1px solid var(--br);flex-shrink:0">`
-        : `<div style="width:48px;height:37px;border-radius:7px;background:var(--s2);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-image" style="color:var(--mu)"></i></div>`
+  try {
+    const resp = await fetch(GH_API + `?ref=${GH_BRANCH}&t=${Date.now()}`, {
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept':        'application/vnd.github.v3+json',
       }
+    });
+
+    if (resp.status === 404) {
+      // File doesn't exist yet — that's OK for a fresh repo
+      console.log('[Admin] projects.json not found — will create on first save');
+      currentSHA = null;
+      projects   = [];
+      setGHBadge('ok', 'GitHub Ready');
+      showGHStatus(true, 'Connected! <strong>projects.json</strong> will be created on first save.');
+      updateStats([]); showRecent([]);
+      return;
+    }
+
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+    const data    = await resp.json();
+    currentSHA    = data.sha;
+    // GitHub returns content as base64 with newlines
+    const decoded = atob(data.content.replace(/
+/g, ''));
+    projects      = JSON.parse(decoded);
+
+    console.log('[Admin] Loaded', projects.length, 'projects from GitHub');
+    setGHBadge('ok', 'GitHub Live ✓');
+    showGHStatus(true, `Connected. <strong>${projects.length}</strong> project(s) in <code>projects.json</code>.`);
+    updateStats(projects);
+    showRecent(projects);
+
+  } catch (e) {
+    console.error('[Admin] GitHub fetch error:', e.message);
+    setGHBadge('error', 'GitHub Error');
+    showGHStatus(false, `Error: ${e.message}. Check your token and repo name.`);
+  }
+}
+
+// ── GITHUB: WRITE projects.json ───────────────────────────────
+async function saveToGitHub(updatedProjects, commitMsg) {
+  const token = getToken();
+  if (!token) { toast('GitHub token missing — go to Settings', 'er'); return false; }
+
+  // Base64 encode the JSON (handle unicode safely)
+  const jsonStr = JSON.stringify(updatedProjects, null, 2);
+  const b64     = btoa(unescape(encodeURIComponent(jsonStr)));
+
+  const body = {
+    message: commitMsg || `Update projects — ${new Date().toLocaleString()}`,
+    content: b64,
+    branch:  GH_BRANCH,
+  };
+  if (currentSHA) body.sha = currentSHA; // required when updating existing file
+
+  console.log('[Admin] Writing to GitHub, SHA:', currentSHA ? currentSHA.slice(0,7) : 'new file');
+
+  const resp = await fetch(GH_API, {
+    method:  'PUT',
+    headers: {
+      'Authorization': `token ${token}`,
+      'Accept':        'application/vnd.github.v3+json',
+      'Content-Type':  'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!resp.ok) {
+    const errData = await resp.json().catch(() => ({}));
+    throw new Error(errData.message || `HTTP ${resp.status}`);
+  }
+
+  const result = await resp.json();
+  currentSHA   = result.content.sha; // update SHA for next write
+  projects     = updatedProjects;
+  console.log('[Admin] GitHub write success, new SHA:', currentSHA.slice(0,7));
+  return true;
+}
+
+// ── UI HELPERS ────────────────────────────────────────────────
+function setGHBadge(state, text) {
+  const dot  = document.getElementById('ghDot');
+  const span = document.getElementById('ghText');
+  dot.className = 'dot ' + (state === 'ok' ? 'ok' : state === 'error' ? 'er' : '');
+  if (text) span.textContent = text;
+}
+
+function showGHStatus(ok, msg) {
+  const panel = document.getElementById('ghStatusPanel');
+  if (!panel) return;
+  const color = ok ? 'var(--grn)' : 'var(--red)';
+  const icon  = ok ? 'fa-check-circle' : 'fa-times-circle';
+  const bg    = ok ? 'rgba(37,211,102,.07)' : 'rgba(232,87,87,.07)';
+  const bord  = ok ? 'rgba(37,211,102,.2)'  : 'rgba(232,87,87,.2)';
+  panel.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:12px;padding:14px;background:${bg};border:1px solid ${bord};border-radius:12px">
+      <i class="fas ${icon}" style="color:${color};font-size:1.2rem;margin-top:2px"></i>
+      <div style="font-size:.85rem;line-height:1.6;color:var(--mu)">${msg}</div>
+    </div>`;
+}
+
+function updateStats(p) {
+  document.getElementById('stT').textContent = p.length;
+  document.getElementById('stL').textContent = p.filter(x => x.status === 'live').length;
+  document.getElementById('stD').textContent = p.filter(x => x.status === 'draft').length;
+}
+
+function showRecent(p) {
+  const panel  = document.getElementById('recentPanel');
+  const recent = [...p].sort((a,b) => b.createdAt - a.createdAt).slice(0,4);
+  if (!recent.length) { panel.innerHTML = '<div class="em"><i class="fas fa-folder-open"></i><p>No projects yet</p></div>'; return; }
+  panel.innerHTML = recent.map(r => `
+    <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(201,168,76,.05)">
+      ${r.image
+        ? `<img src="${r.image}" style="width:48px;height:37px;border-radius:7px;object-fit:cover;border:1px solid var(--br);flex-shrink:0">`
+        : `<div style="width:48px;height:37px;border-radius:7px;background:var(--s2);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-image" style="color:var(--mu)"></i></div>`}
       <div style="flex:1;min-width:0">
-        <div style="font-weight:600;font-size:.87rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(p.title)}</div>
-        <div style="color:var(--mu);font-size:.73rem;margin-top:1px">${escapeHtml(p.category)}</div>
+        <div style="font-weight:600;font-size:.87rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.title}</div>
+        <div style="color:var(--mu);font-size:.73rem;margin-top:1px">${r.category}</div>
       </div>
-      <div class="${p.status === 'live' ? 'status-live' : 'status-draft'}">${p.status === 'live' ? 'Live' : 'Draft'}</div>
+      <div class="${r.status==='live'?'sl':'sd'}">${r.status==='live'?'Live':'Draft'}</div>
     </div>`).join('');
 }
 
-// ── 8. PROJECTS TABLE ─────────────────────────────────────────
-async function loadProjectsTable(filter) {
-  filter = filter || activeFilter;
-  const tableEl = document.getElementById('projectTable');
-  tableEl.innerHTML = '<div class="loading-state"><i class="fas fa-spinner"></i>Loading…</div>';
-
-  let projects = await fetchAllProjects();
-  if (filter !== 'all') projects = projects.filter(p => p.status === filter);
-
-  if (!projects.length) {
-    tableEl.innerHTML = '<div class="empty-state" style="padding:36px"><i class="fas fa-folder-open"></i><p>No projects found</p></div>';
-    return;
-  }
-
-  tableEl.innerHTML = `
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Screenshot</th><th>Title</th><th>Category</th><th>Status</th><th>Actions</th>
-        </tr>
-      </thead>
+// ── TABLE ─────────────────────────────────────────────────────
+function renderTable(f) {
+  f = f || curFilter;
+  let p = [...projects].sort((a,b) => b.createdAt - a.createdAt);
+  if (f !== 'all') p = p.filter(x => x.status === f);
+  const wrap = document.getElementById('tblWrap');
+  if (!p.length) { wrap.innerHTML = '<div class="em" style="padding:36px"><i class="fas fa-folder-open"></i><p>No projects found</p></div>'; return; }
+  wrap.innerHTML = `
+    <table class="tbl">
+      <thead><tr><th>Screenshot</th><th>Title</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead>
       <tbody>
-        ${projects.map(p => `
-        <tr>
-          <td>${p.image
-            ? `<img src="${p.image}" class="thumb">`
-            : `<div class="thumb-ph"><i class="fas fa-image"></i></div>`
-          }</td>
-          <td style="max-width:180px">
-            <div style="font-weight:600;font-size:.86rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(p.title)}</div>
-            <div style="color:var(--mu);font-size:.73rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px;margin-top:1px">${escapeHtml(p.desc)}</div>
-          </td>
-          <td><span class="tag-badge">${escapeHtml(p.category)}</span></td>
-          <td><div class="${p.status === 'live' ? 'status-live' : 'status-draft'}">${p.status === 'live' ? 'Live' : 'Draft'}</div></td>
-          <td><div class="actions">
-            ${p.url ? `<a href="${p.url}" target="_blank" class="btn btn-outline btn-sm"><i class="fas fa-external-link-alt"></i></a>` : ''}
-            <button class="btn btn-outline btn-sm" onclick="openEdit('${p.id}')"><i class="fas fa-pen"></i></button>
-            <button class="btn btn-danger btn-sm" onclick="openDelete('${p.id}','${escapeAttr(p.title)}')"><i class="fas fa-trash"></i></button>
-          </div></td>
-        </tr>`).join('')}
+        ${p.map(x => `
+          <tr>
+            <td>${x.image ? `<img src="${x.image}" class="tthumb">` : `<div class="tph"><i class="fas fa-image"></i></div>`}</td>
+            <td style="max-width:180px">
+              <div style="font-weight:600;font-size:.86rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x.title}</div>
+              <div style="color:var(--mu);font-size:.73rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px;margin-top:1px">${x.desc}</div>
+            </td>
+            <td><span class="tg">${x.category}</span></td>
+            <td><div class="${x.status==='live'?'sl':'sd'}">${x.status==='live'?'Live':'Draft'}</div></td>
+            <td><div class="ac">
+              ${x.url ? `<a href="${x.url}" target="_blank" class="btn bo bsm"><i class="fas fa-external-link-alt"></i></a>` : ''}
+              <button class="btn bo bsm" onclick="openEdit('${x.id}')"><i class="fas fa-pen"></i></button>
+              <button class="btn bd bsm" onclick="openDelete('${x.id}','${x.title.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i></button>
+            </div></td>
+          </tr>`).join('')}
       </tbody>
     </table>`;
 }
 
-window.applyFilter = function(filter, btn) {
-  activeFilter = filter;
-  document.querySelectorAll('.filter-bar .btn').forEach(b => {
-    b.className = 'btn btn-outline btn-sm';
-  });
-  btn.className = 'btn btn-gold btn-sm';
-  loadProjectsTable(filter);
+window.filt = function(t, btn) {
+  curFilter = t;
+  document.querySelectorAll('[onclick^="filt"]').forEach(b => b.className = 'btn bo bsm');
+  btn.className = 'btn bg bsm';
+  renderTable(t);
 };
 
-// ── 9. ADD PROJECT — FORM VALIDATION + addDoc ────────────────
-// This is the CORE write operation of the admin page.
-// Public index.html never writes — it only calls getDocs.
-
-window.saveProject = async function() {
-  const title    = document.getElementById('fTitle').value.trim();
-  const category = document.getElementById('fCategory').value;
-  const desc     = document.getElementById('fDesc').value.trim();
-  const url      = document.getElementById('fUrl').value.trim();
-  const status   = document.getElementById('fStatus').value;
-
-  // ── Form validation ──────────────────────────────────────
-  let isValid = true;
-
-  if (!title) {
-    showFieldError('fTitle', 'errTitle', true);
-    isValid = false;
-  } else {
-    showFieldError('fTitle', 'errTitle', false);
-  }
-
-  if (!category) {
-    showFieldError('fCategory', 'errCategory', true);
-    isValid = false;
-  } else {
-    showFieldError('fCategory', 'errCategory', false);
-  }
-
-  if (!desc) {
-    showFieldError('fDesc', 'errDesc', true);
-    isValid = false;
-  } else {
-    showFieldError('fDesc', 'errDesc', false);
-  }
-
-  if (!isValid) {
-    showToast('Please fill in all required fields', 'er');
-    return;
-  }
-
-  // ── Disable button while saving ──────────────────────────
-  const saveBtn = document.getElementById('saveBtn');
-  saveBtn.disabled = true;
-  saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
-
-  // ── Build document object ────────────────────────────────
-  const projectData = {
-    title,
-    category,
-    desc,
-    url:       url || null,
-    status,
-    image:     uploadedImage || null,
-    createdAt: serverTimestamp(),  // ← server-side timestamp (not Date.now())
-    updatedAt: serverTimestamp()
-  };
-
-  console.log('[Admin] Attempting addDoc with data:', { title, category, status });
-
-  // ── addDoc: creates a new document with auto-generated ID ─
-  try {
-    const docRef = await addDoc(collection(db, 'projects'), projectData);
-    console.log('[Admin] ✅ Project saved. Document ID:', docRef.id);
-
-    showToast('Project saved to Firebase! ✓', 'ok');
-    resetAddForm();
-
-    // Navigate back to All Projects to confirm save
-    gotoPage('projects', document.querySelectorAll('.nav-item')[1]);
-
-  } catch (err) {
-    console.error('[Admin] ❌ addDoc failed:', err);
-    showToast('Save failed: ' + err.message, 'er');
-  } finally {
-    saveBtn.disabled = false;
-    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save to Firebase';
-  }
-};
-
-function showFieldError(inputId, errorId, show) {
-  const input = document.getElementById(inputId);
-  const errEl = document.getElementById(errorId);
-  if (show) {
-    input.classList.add('error');
-    errEl.style.display = 'block';
-  } else {
-    input.classList.remove('error');
-    errEl.style.display = 'none';
-  }
-}
-
-function resetAddForm() {
+// ── ADD FORM ──────────────────────────────────────────────────
+function resetForm() {
+  document.getElementById('editId').value = '';
+  document.getElementById('addTitle').textContent = 'Add New Project';
   ['fTitle','fDesc','fUrl'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('fCategory').value = '';
+  document.getElementById('fCat').value    = '';
   document.getElementById('fStatus').value = 'live';
-  document.getElementById('previewWrap').innerHTML = '';
-  document.getElementById('fileInput').value = '';
+  document.getElementById('prevWrap').innerHTML = '';
   document.getElementById('cTitle').textContent = '0';
-  document.getElementById('cDesc').textContent = '0';
-  document.getElementById('formHeading').textContent = 'Add New Project';
-  // Clear field errors
-  ['errTitle','errCategory','errDesc'].forEach(id => {
-    document.getElementById(id).style.display = 'none';
-  });
-  ['fTitle','fCategory','fDesc'].forEach(id => {
-    document.getElementById(id).classList.remove('error');
-  });
-  uploadedImage = null;
+  document.getElementById('cDesc').textContent  = '0';
+  curImg = null;
 }
+window.cancelForm = () => { resetForm(); gp('projects', document.querySelectorAll('.ni')[1]); };
+window.cc = (el, cid) => document.getElementById(cid).textContent = el.value.length;
 
-window.cancelForm = () => {
-  resetAddForm();
-  gotoPage('projects', document.querySelectorAll('.nav-item')[1]);
+function readImg(file, cb) {
+  if (file.size > 300 * 1024) { toast('Max 300KB per image', 'er'); return; }
+  const r = new FileReader();
+  r.onload  = e => cb(e.target.result);
+  r.onerror = () => toast('Failed to read image', 'er');
+  r.readAsDataURL(file);
+}
+window.imgSel = e => {
+  const f = e.target.files[0]; if (!f) return;
+  readImg(f, d => {
+    curImg = d;
+    document.getElementById('prevWrap').innerHTML =
+      `<div class="pi"><img src="${d}"><button class="rmi" onclick="remImg()"><i class="fas fa-times"></i></button></div>`;
+  });
+};
+window.remImg = () => { curImg = null; document.getElementById('prevWrap').innerHTML = ''; document.getElementById('fImg').value = ''; };
+window.dov = e => { e.preventDefault(); document.getElementById('upa').classList.add('dv'); };
+window.dlv = () => document.getElementById('upa').classList.remove('dv');
+window.ddp = e => {
+  e.preventDefault(); dlv();
+  const f = e.dataTransfer.files[0];
+  if (!f || !f.type.startsWith('image/')) { toast('Drop an image file', 'er'); return; }
+  readImg(f, d => {
+    curImg = d;
+    document.getElementById('prevWrap').innerHTML =
+      `<div class="pi"><img src="${d}"><button class="rmi" onclick="remImg()"><i class="fas fa-times"></i></button></div>`;
+  });
 };
 
-// ── 10. IMAGE UPLOAD (base64, max 1MB) ───────────────────────
-function readImageAsBase64(file, callback) {
-  if (file.size > 1024 * 1024) {
-    showToast('Max image size is 1MB', 'er');
-    console.warn('[Admin] Image rejected — too large:', file.size, 'bytes');
-    return;
+// ── SAVE PROJECT ──────────────────────────────────────────────
+window.saveProject = async function() {
+  const title  = document.getElementById('fTitle').value.trim();
+  const cat    = document.getElementById('fCat').value;
+  const desc   = document.getElementById('fDesc').value.trim();
+  const url    = document.getElementById('fUrl').value.trim();
+  const status = document.getElementById('fStatus').value;
+
+  if (!title) { toast('Title is required', 'er'); return; }
+  if (!cat)   { toast('Select a category', 'er'); return; }
+  if (!desc)  { toast('Description is required', 'er'); return; }
+
+  const btn = document.getElementById('saveBtn');
+  btn.disabled  = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving to GitHub...';
+
+  try {
+    const newProject = {
+      id:        Date.now().toString(),
+      title, category: cat, desc,
+      url:       url || '',
+      status,
+      image:     curImg || null,
+      createdAt: Date.now(),
+    };
+    const updated = [...projects, newProject];
+    await saveToGitHub(updated, `Add project: ${title}`);
+    toast('Saved to GitHub! ✓', 'ok');
+    resetForm();
+    gp('projects', document.querySelectorAll('.ni')[1]);
+  } catch(e) {
+    console.error('[Admin] saveProject error:', e.message);
+    toast('GitHub save failed: ' + e.message, 'er');
   }
-  const reader = new FileReader();
-  reader.onload = e => {
-    console.log('[Admin] Image read as base64, size:', Math.round(file.size / 1024), 'KB');
-    callback(e.target.result);
-  };
-  reader.readAsDataURL(file);
-}
-
-window.onFileSelect = e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  readImageAsBase64(file, data => {
-    uploadedImage = data;
-    document.getElementById('previewWrap').innerHTML =
-      `<div class="preview-img">
-        <img src="${data}">
-        <button class="remove-img" onclick="removeImage()"><i class="fas fa-times"></i></button>
-      </div>`;
-  });
+  btn.disabled  = false;
+  btn.innerHTML = '<i class="fas fa-save"></i> Save to GitHub';
 };
 
-window.removeImage = () => {
-  uploadedImage = null;
-  document.getElementById('previewWrap').innerHTML = '';
-  document.getElementById('fileInput').value = '';
-  console.log('[Admin] Image removed from form.');
-};
-
-window.onDragOver  = e => { e.preventDefault(); document.getElementById('uploadArea').classList.add('drag-over'); };
-window.onDragLeave = () => document.getElementById('uploadArea').classList.remove('drag-over');
-window.onDrop      = e => {
-  e.preventDefault();
-  window.onDragLeave();
-  const file = e.dataTransfer.files[0];
-  if (!file || !file.type.startsWith('image/')) { showToast('Please drop an image file', 'er'); return; }
-  readImageAsBase64(file, data => {
-    uploadedImage = data;
-    document.getElementById('previewWrap').innerHTML =
-      `<div class="preview-img">
-        <img src="${data}">
-        <button class="remove-img" onclick="removeImage()"><i class="fas fa-times"></i></button>
-      </div>`;
-  });
-};
-
-// ── 11. EDIT / updateDoc ─────────────────────────────────────
+// ── EDIT ──────────────────────────────────────────────────────
 window.openEdit = function(id) {
-  const p = allProjects.find(x => x.id === id);
-  if (!p) { console.error('[Admin] Project not found for edit:', id); return; }
-
-  editingId = id;
-  editUploadedImage = p.image || null;
-
-  document.getElementById('eTitle').value    = p.title;
-  document.getElementById('eCategory').value = p.category;
-  document.getElementById('eDesc').value     = p.desc;
-  document.getElementById('eUrl').value      = p.url || '';
-  document.getElementById('eStatus').value   = p.status;
-  document.getElementById('eImgPreview').innerHTML = p.image
-    ? `<img src="${p.image}" style="width:80px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--br)">`
+  const p = projects.find(x => x.id === id); if (!p) return;
+  editingId = id; editImg = p.image || null;
+  document.getElementById('eTitle').value  = p.title;
+  document.getElementById('eCat').value    = p.category;
+  document.getElementById('eDesc').value   = p.desc;
+  document.getElementById('eUrl').value    = p.url || '';
+  document.getElementById('eStatus').value = p.status;
+  document.getElementById('eImgPrev').innerHTML = p.image
+    ? `<img src="${p.image}" style="width:75px;height:58px;object-fit:cover;border-radius:8px;border:1px solid var(--br)">`
     : '';
-  document.getElementById('editModal').classList.add('open');
-  console.log('[Admin] Opened edit modal for project:', id);
+  document.getElementById('emod').classList.add('open');
 };
-
-window.onEditFileSelect = e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  readImageAsBase64(file, data => {
-    editUploadedImage = data;
-    document.getElementById('eImgPreview').innerHTML =
-      `<img src="${data}" style="width:80px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--br)">`;
+window.eImgSel = e => {
+  const f = e.target.files[0]; if (!f) return;
+  readImg(f, d => {
+    editImg = d;
+    document.getElementById('eImgPrev').innerHTML =
+      `<img src="${d}" style="width:75px;height:58px;object-fit:cover;border-radius:8px;border:1px solid var(--br)">`;
   });
 };
-
 window.updateProject = async function() {
-  const title    = document.getElementById('eTitle').value.trim();
-  const category = document.getElementById('eCategory').value;
-  const desc     = document.getElementById('eDesc').value.trim();
-  const url      = document.getElementById('eUrl').value.trim();
-  const status   = document.getElementById('eStatus').value;
+  const title  = document.getElementById('eTitle').value.trim();
+  const cat    = document.getElementById('eCat').value;
+  const desc   = document.getElementById('eDesc').value.trim();
+  const url    = document.getElementById('eUrl').value.trim();
+  const status = document.getElementById('eStatus').value;
+  if (!title) { toast('Title required', 'er'); return; }
 
-  if (!title)    { showToast('Title is required', 'er'); return; }
-  if (!category) { showToast('Please select a category', 'er'); return; }
-  if (!desc)     { showToast('Description is required', 'er'); return; }
-
-  const updateBtn = document.getElementById('updateBtn');
-  updateBtn.disabled = true;
-  updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-  const updateData = {
-    title,
-    category,
-    desc,
-    url:       url || null,
-    status,
-    image:     editUploadedImage || null,
-    updatedAt: serverTimestamp()
-  };
-
-  console.log('[Admin] Updating project:', editingId, updateData.title);
+  const btn = document.getElementById('updBtn');
+  btn.disabled  = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
   try {
-    await updateDoc(doc(db, 'projects', editingId), updateData);
-    console.log('[Admin] ✅ Project updated:', editingId);
-    showToast('Updated successfully! ✓', 'ok');
-    closeEdit();
-    loadProjectsTable();
-    loadDashboard();
-  } catch (err) {
-    console.error('[Admin] ❌ updateDoc failed:', err);
-    showToast('Update failed: ' + err.message, 'er');
-  } finally {
-    updateBtn.disabled = false;
-    updateBtn.innerHTML = '<i class="fas fa-save"></i> Save';
+    const orig    = projects.find(x => x.id === editingId);
+    const updated = projects.map(x => x.id === editingId
+      ? { ...x, title, category: cat, desc, url: url||'', status, image: editImg || (orig ? orig.image : null), updatedAt: Date.now() }
+      : x);
+    await saveToGitHub(updated, `Update project: ${title}`);
+    toast('Updated on GitHub! ✓', 'ok');
+    closeEdit(); renderTable();
+    document.getElementById('stT').textContent = projects.length;
+    document.getElementById('stL').textContent = projects.filter(x=>x.status==='live').length;
+    document.getElementById('stD').textContent = projects.filter(x=>x.status==='draft').length;
+  } catch(e) {
+    toast('Update failed: ' + e.message, 'er');
   }
+  btn.disabled  = false;
+  btn.innerHTML = '<i class="fas fa-save"></i> Save to GitHub';
 };
+window.closeEdit = () => { document.getElementById('emod').classList.remove('open'); editingId=null; editImg=null; document.getElementById('eImg').value=''; };
 
-window.closeEdit = () => {
-  document.getElementById('editModal').classList.remove('open');
-  document.getElementById('eFile').value = '';
-  editingId = null;
-  editUploadedImage = null;
-};
-
-// ── 12. DELETE / deleteDoc ───────────────────────────────────
-window.openDelete = (id, name) => {
-  deleteId = id;
-  document.getElementById('deleteTitle').textContent = name;
-  document.getElementById('deleteModal').classList.add('open');
-  console.log('[Admin] Opened delete confirm for:', id, name);
-};
-
-window.closeDelete = () => {
-  document.getElementById('deleteModal').classList.remove('open');
-  deleteId = null;
-};
-
+// ── DELETE ────────────────────────────────────────────────────
+window.openDelete  = (id, name) => { deletingId=id; document.getElementById('dname').textContent=name; document.getElementById('dmod').classList.add('open'); };
+window.closeDelete = () => { document.getElementById('dmod').classList.remove('open'); deletingId=null; };
 window.confirmDelete = async function() {
-  if (!deleteId) return;
-  console.log('[Admin] Deleting project:', deleteId);
   try {
-    await deleteDoc(doc(db, 'projects', deleteId));
-    console.log('[Admin] ✅ Project deleted:', deleteId);
-    showToast('Project deleted', 'info');
-    closeDelete();
-    loadProjectsTable();
-    loadDashboard();
-  } catch (err) {
-    console.error('[Admin] ❌ deleteDoc failed:', err);
-    showToast('Delete failed: ' + err.message, 'er');
+    const updated = projects.filter(x => x.id !== deletingId);
+    await saveToGitHub(updated, 'Delete project');
+    toast('Deleted from GitHub', 'in');
+    closeDelete(); renderTable(); updateStats(projects); showRecent(projects);
+  } catch(e) { toast('Delete failed: ' + e.message, 'er'); }
+};
+
+// ── GITHUB TOKEN SETTINGS ─────────────────────────────────────
+function loadSettings() {
+  const saved = getToken();
+  const inp   = document.getElementById('ghTokenInput');
+  if (saved) inp.value = saved;
+}
+window.saveToken = function() {
+  const t = document.getElementById('ghTokenInput').value.trim();
+  if (!t) { toast('Paste your GitHub token first', 'er'); return; }
+  localStorage.setItem('ss_gh_token', t);
+  toast('Token saved locally ✓', 'ok');
+  testToken();
+};
+window.testToken = async function() {
+  const token  = getToken();
+  const status = document.getElementById('tokenStatus');
+  if (!token) { status.className='token-status er'; status.style.display='flex'; status.innerHTML='<i class="fas fa-times-circle"></i> No token saved'; return; }
+  status.className='token-status in'; status.style.display='flex'; status.innerHTML='<i class="fas fa-spinner fa-spin"></i> Testing...';
+  try {
+    const resp = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}`, {
+      headers: { 'Authorization': `token ${token}` }
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      status.className='token-status ok'; status.innerHTML=`<i class="fas fa-check-circle"></i> Connected to <strong>${data.full_name}</strong> ✓`;
+      setGHBadge('ok','GitHub Live ✓');
+    } else {
+      status.className='token-status er'; status.innerHTML=`<i class="fas fa-times-circle"></i> Error ${resp.status} — check token or repo name`;
+      setGHBadge('error','Token Error');
+    }
+  } catch(e) {
+    status.className='token-status er'; status.innerHTML=`<i class="fas fa-times-circle"></i> ${e.message}`;
   }
 };
 
-// ── 13. TOAST NOTIFICATIONS ───────────────────────────────────
-window.showToast = function(message, type = 'info') {
-  const icons = { ok: 'fa-check-circle', er: 'fa-exclamation-circle', info: 'fa-info-circle' };
-  const wrap  = document.getElementById('toastWrap');
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.innerHTML = `<i class="fas ${icons[type] || icons.info} ti"></i><span>${message}</span>`;
-  wrap.appendChild(toast);
-  setTimeout(() => {
-    toast.style.opacity   = '0';
-    toast.style.transform = 'translateX(18px)';
-    toast.style.transition = '.3s';
-    setTimeout(() => toast.remove(), 350);
-  }, 3500);
+// ── TOAST ─────────────────────────────────────────────────────
+window.toast = function(msg, type='in') {
+  const ic = {ok:'fa-check-circle',er:'fa-exclamation-circle',in:'fa-info-circle'};
+  const w  = document.getElementById('twrap');
+  const t  = document.createElement('div'); t.className=`ts ${type}`;
+  t.innerHTML=`<i class="fas ${ic[type]} ti"></i><span>${msg}</span>`;
+  w.appendChild(t);
+  setTimeout(()=>{t.style.cssText='opacity:0;transform:translateX(18px);transition:.3s ease';setTimeout(()=>t.remove(),350);},3500);
 };
 
-// ── 14. UTILITY ───────────────────────────────────────────────
-function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function escapeAttr(str) {
-  if (!str) return '';
-  return str.replace(/'/g,'&#39;').replace(/"/g,'&quot;');
-}
-
-window.updateCharCount = function(el, counterId, max) {
-  document.getElementById(counterId).textContent = el.value.length;
-};
-
-// ── Close modals on backdrop click ───────────────────────────
-document.getElementById('editModal').addEventListener('click', e => {
-  if (e.target === document.getElementById('editModal')) closeEdit();
+// Close modals on overlay click
+['emod','dmod'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => {
+    if (e.target === document.getElementById(id)) {
+      id === 'emod' ? closeEdit() : closeDelete();
+    }
+  });
 });
-document.getElementById('deleteModal').addEventListener('click', e => {
-  if (e.target === document.getElementById('deleteModal')) closeDelete();
-});
-
 </script>
 </body>
 </html>
